@@ -2049,6 +2049,22 @@ def page_paper_session() -> None:
     if "ps_start_time"  not in st.session_state: st.session_state.ps_start_time  = None
     if "ps_duration"    not in st.session_state: st.session_state.ps_duration    = 5
 
+    # ── Auto-wznowienie aktywnej sesji po powrocie na stronę ──────────────────
+    if st.session_state.ps_status == "idle" or st.session_state.ps_session_id is None:
+        active_sessions = _get("/paper-sessions") or []
+        running = [s for s in active_sessions if s.get("status") == "running"]
+        if running:
+            # Wznów ostatnią aktywną sesję
+            last = running[-1]
+            sid  = last["session_id"]
+            st.session_state.ps_session_id  = sid
+            st.session_state.ps_status      = "running"
+            st.session_state.ps_live_trades = []
+            import datetime as _dt
+            st.session_state.ps_start_time  = _dt.datetime.now().isoformat()
+            # Oszacuj czas trwania z liczby tradów
+            st.session_state.ps_duration    = last.get("duration_min", 5)
+
     # ── Konfiguracja ─────────────────────────────────────────────────────────
     if st.session_state.ps_status == "idle":
         st.subheader("⚙️ Konfiguracja sesji")
