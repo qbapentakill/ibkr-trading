@@ -1,0 +1,61 @@
+# Środowisko
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Konfiguracja (NIGDY nie commituj!)
+.env
+.env.local
+.env.*.local
+
+# Baza danych
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Logi (mogą zawierać dane wrażliwe)
+logs/
+*.log
+
+# Tymczasowe
+tmp/
+temp/
+*.tmp
+.cache/
+.pytest_cache/
+
+# Node (jeśli używasz frontend'u)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Testy
+.coverage
+htmlcov/
+.tox/
+
+# Dane backtestów
+backtest_results/
+*.csv.bak
+
+# OS
+Thumbs.db
+.DS_Store
