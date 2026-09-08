@@ -58,7 +58,67 @@ settings = get_settings()
 # System Prompt
 # ══════════════════════════════════════════════════════════════════════════════
 
-SYSTEM_PROMPT = """Jesteś inteligentnym asystentem zarządzającym systemem automatycznego tradingu opartym o Interactive Brokers (IBKR).
+SYSTEM_PROMPT = """Jesteś inteligentnym asystentem AI systemu automatycznego tradingu IBKR Multi-Agent.
+
+TWOJA ROLA:
+- Pomagasz użytkownikowi monitorować i sterować systemem tradingowym
+- Odpowiadasz na pytania o rynek, strategie, kryptowaluty, akcje, ETF, wskaźniki techniczne
+- Tłumaczysz jak działają agenci, ich strategie i wyniki
+- Analizujesz dane rynkowe i dajesz rekomendacje
+- Odpowiadasz po POLSKU (chyba że użytkownik pisze po angielsku)
+- Jesteś precyzyjny, zwięzły i profesjonalny jak doświadczony trader
+
+MOŻESZ ODPOWIADAĆ NA:
+- Pytania o rynek (akcje, krypto, ETF, forex, surowce)
+- Analizę techniczną (RSI, MACD, Bollinger Bands, EMA, ADX, itp.)
+- Strategie tradingowe (trend following, mean reversion, scalping, breakout)
+- Makroekonomię (Fed, inflacja, stopy procentowe, GDP, NFP)
+- Wyniki i działanie agentów w systemie
+- Zarządzanie ryzykiem i pozycjami
+- Optymalizację strategii
+- Ogólne pytania finansowe i inwestycyjne
+
+AGENCI W SYSTEMIE:
+1. TrendFollower – EMA+ADX multi-TF, cierpliwy strateg
+2. MeanReversion – BB+RSI+zscore, matematyczny kontrarian
+3. Scalper – volume spikes, agresywny krótkoterminowy
+4. BreakoutHunter – S/R breakout + ATR, oportunista
+5. SentimentTrader – RSS+VADER+NLP, reaguje na Fed/Trump/Musk
+6. OptionsFlow – unusual options activity, śledzi smart money
+7. GapTrader – luki cenowe przy otwarciu
+8. MomentumSurfer – ROC+RSI, najsilniejsze momentum
+9. VIXTrader – indeks strachu, kupuje panikę
+10. DivergenceHunter – dywergencje RSI/MACD vs cena
+11. ScalpKing – ultra-szybki scalp 9:30-10:45 EST
+12. WhaleTracker – tropiciel dużych transakcji
+13. MarketAnalyst – regime detection, korelacje sektorów
+14. NewsAnalyst – HIGH/MEDIUM/LOW impact klasyfikacja
+15. EarningsWatcher – kalendarze wyników spółek
+16. MacroAnalyst – dane makro → agresywność systemu
+17. CorrelationGuard – wykrywa skupienie korelacji
+18. HeatmapAnalyst – analiza sektorów rynku
+19. EconomicCalendar – blokada przed Fed/NFP/CPI
+20. RiskManager – absolutne VETO, zarządza ryzykiem
+21. PerformanceReviewer – post-trade analytics
+22. PortfolioAllocator – Kelly Criterion, dynamiczna alokacja
+23. ResearchAgent – MTF analiza fundamentalna
+24. SmartMoneyTracker – OBV, CMF, akumulacja/dystrybucja
+
+DOSTĘPNE KOMENDY SYSTEMOWE (JSON format):
+- enable_agent, disable_agent, set_allocation, set_risk_param
+- emergency_stop, get_status, get_positions, get_signals
+- get_performance, get_news
+
+ZASADY:
+- Emergency Stop i zamykanie pozycji wymagają potwierdzenia
+- Nigdy nie aktywuj real mode przez chat
+- Bądź pomocny, edukacyjny i konkretny
+
+FORMAT: Jeśli chcesz wykonać akcję systemową, dodaj blok:
+```action
+{"action": "...", ...}
+```
+"""
 
 TWOJA ROLA:
 - Pomagasz użytkownikowi monitorować i sterować systemem tradingowym
@@ -128,6 +188,8 @@ class AIChatEngine:
         s = get_settings()
         if getattr(s, "openai_api_key", None):
             return "openai"
+        if getattr(s, "groq_api_key", None):
+            return "groq"
         # Sprawdź czy Ollama działa lokalnie
         try:
             import httpx
@@ -189,6 +251,8 @@ class AIChatEngine:
         # Wywołaj LLM lub wbudowany parser
         if self._backend == "openai":
             raw_response = await self._openai_chat(message, history, context)
+        elif self._backend == "groq":
+            raw_response = await self._groq_chat(message, history, context)
         elif self._backend == "ollama":
             raw_response = await self._ollama_chat(message, history, context)
         else:
@@ -241,6 +305,46 @@ class AIChatEngine:
     # ──────────────────────────────────────────────────────────────────────────
     # LLM backends
     # ──────────────────────────────────────────────────────────────────────────
+
+    async def _groq_chat(
+        self, message: str, history: list[dict], context: str
+    ) -> str:
+        """Groq API — darmowy dostęp do Llama 3.3 70B."""
+        try:
+            import httpx
+            api_key = get_settings().groq_api_key
+            model   = get_settings().groq_model
+
+            messages = [
+                {"role": "system", "content": SYSTEM_PROMPT + "\n\nAKTUALNY STAN SYSTEMU:\n" + context}
+            ]
+            for h in history[-10:]:
+                messages.append({"role": h["role"], "content": h["content"]})
+            messages.append({"role": "user", "content": message})
+
+            async with httpx.AsyncClient(timeout=30) as client:
+                resp = await client.post(
+                    "https://api.groq.com/openai/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {api_key}",
+                        "Content-Type": "application/json",
+                    },
+                    json={
+                        "model":       model,
+                        "messages":    messages,
+                        "temperature": 0.4,
+                        "max_tokens":  2000,
+                    },
+                )
+                data = resp.json()
+                if resp.status_code == 200:
+                    return data["choices"][0]["message"]["content"]
+                else:
+                    log.error("Groq error: {}", data)
+                    return self._builtin_response(message, context)
+        except Exception as exc:
+            log.error("Groq error: {}", exc)
+            return self._builtin_response(message, context)
 
     async def _openai_chat(
         self, message: str, history: list[dict], context: str

@@ -68,6 +68,8 @@ class Settings(BaseSettings):
     # ── AI Chat ───────────────────────────────────────────────────────────────
     openai_api_key:  Optional[str] = None
     openai_model:    str = "gpt-4o-mini"
+    groq_api_key:    Optional[str] = None
+    groq_model:      str = "llama-3.3-70b-versatile"
     ollama_model:    str = "llama3"
     ollama_base_url: str = "http://localhost:11434"
 
