@@ -182,15 +182,27 @@ class AIChatEngine:
     def get_instance(cls) -> "AIChatEngine":
         if cls._instance is None:
             cls._instance = cls()
+        # Sprawdź czy backend się zmienił (np. dodano nowy klucz API)
+        elif cls._instance._backend == "builtin":
+            new_backend = cls._instance._detect_backend()
+            if new_backend != "builtin":
+                cls._instance._backend = new_backend
+                log.info("AI Chat: przełączono backend na {}", new_backend)
         return cls._instance
 
     def _detect_backend(self) -> str:
+        # Reset cache żeby wczytać świeże ustawienia z .env
+        from config.settings import get_settings as _gs
+        try:
+            _gs.cache_clear()
+        except Exception:
+            pass
         s = get_settings()
         if getattr(s, "openai_api_key", None):
             return "openai"
         if getattr(s, "groq_api_key", None):
+            log.info("AI Chat: używam Groq ({})", getattr(s, "groq_model", "llama-3.3-70b-versatile"))
             return "groq"
-        # Sprawdź czy Ollama działa lokalnie
         try:
             import httpx
             r = httpx.get("http://localhost:11434/api/tags", timeout=2)
