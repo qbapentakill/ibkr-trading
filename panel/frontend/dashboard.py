@@ -106,8 +106,13 @@ st.markdown("""
         color: #f5f5f7;
         font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Text', sans-serif;
         padding-top: 44px;
+        min-height: 100vh;
     }
-    .main .block-container { padding: 5rem 3rem 2rem 3rem; max-width: 100%; }
+    .main .block-container { 
+        padding: 2rem 3rem 3rem 3rem; 
+        max-width: 100%; 
+        min-height: calc(100vh - 44px);
+    }
 
     /*  Ticker bar  */
     .ticker-wrapper {
