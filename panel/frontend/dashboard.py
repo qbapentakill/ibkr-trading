@@ -757,6 +757,17 @@ def render_top_nav() -> None:
     with col_more:
         more_labels = [label for label, _ in more_pages]
         current_in_more = any(key == current_page for _, key in more_pages)
+        
+        # Callback do zmiany strony
+        def change_page_from_dropdown():
+            selected = st.session_state.nav_dropdown
+            if selected and selected != "Więcej ▾":
+                for label, key in more_pages:
+                    if label == selected:
+                        st.session_state.active_page = key
+                        break
+        
+        # Ustaw index na aktualną stronę jeśli jest w dropdown
         default_idx = 0
         if current_in_more:
             for idx, (label, key) in enumerate(more_pages):
@@ -764,19 +775,14 @@ def render_top_nav() -> None:
                     default_idx = idx + 1
                     break
         
-        selected = st.selectbox(
+        st.selectbox(
             "More",
             ["Więcej ▾"] + more_labels,
             index=default_idx,
             key="nav_dropdown",
-            label_visibility="collapsed"
+            label_visibility="collapsed",
+            on_change=change_page_from_dropdown
         )
-        if selected != "Więcej ▾":
-            for label, key in more_pages:
-                if label == selected:
-                    st.session_state.active_page = key
-                    st.rerun()
-                    break
     
     # Status + user
     with col_status:
