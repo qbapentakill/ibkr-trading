@@ -698,44 +698,53 @@ PAGES = {
 }
 
 def render_top_nav() -> None:
-    """Renderuje górną nawigację w stylu Apple.com"""
+    """Renderuje górną nawigację - buttony w kolumnach"""
     status = _get_status() if st.session_state.logged_in else {}
     agents_running = status.get("agents_running", True) if status else True
     
-    # Pobierz aktualną stronę z query params lub session_state
-    if "page" in st.query_params:
-        st.session_state.active_page = st.query_params["page"]
-    
     current_page = st.session_state.get("active_page", "Dashboard")
     
-    # Status badge
-    status_class = "status-active" if agents_running else "status-inactive"
-    status_text = "AKTYWNI" if agents_running else "ZATRZYMANI"
+    # Render status bar
+    col_logo, col_menu, col_status = st.columns([1, 6, 2])
     
-    # Menu items
-    menu_items = []
-    for label, key in PAGES.items():
-        if _is_viewer() and key in ("Ryzyko", "Backtester", "AI Chat", "Logi", "Emergency", "Uzytkownicy"):
-            continue
-        active_class = "active" if key == current_page else ""
-        menu_items.append(f'<a class="top-nav-item {active_class}" href="?page={key}">{label}</a>')
+    with col_logo:
+        st.markdown("### IBKR Trading")
     
-    menu_html = "\n".join(menu_items)
+    with col_menu:
+        # Main pages
+        menu_cols = st.columns(9)
+        pages_main = [
+            ("Dashboard", "Dashboard"),
+            ("Agenci", "Agenci"),
+            ("Pozycje", "Pozycje"),
+            ("Transakcje", "Transakcje"),
+            ("Sygnały", "Sygnały"),
+            ("Ryzyko", "Ryzyko"),
+            ("Wydajność", "Wydajność"),
+            ("Szef", "Szef"),
+            ("Więcej", None),  # dropdown placeholder
+        ]
+        
+        for i, (label, key) in enumerate(pages_main):
+            if key and not (_is_viewer() and key in ("Ryzyko",)):
+                btn_type = "primary" if key == current_page else "secondary"
+                if menu_cols[i].button(label, key=f"nav_{key}", use_container_width=True, type=btn_type):
+                    st.session_state.active_page = key
+                    st.rerun()
     
-    nav_html = f'''
-    <div class="top-nav">
-        <div class="top-nav-logo">IBKR Trading System</div>
-        <div class="top-nav-menu">
-            {menu_html}
-        </div>
-        <div class="top-nav-status">
-            <span class="status-badge {status_class}">{status_text}</span>
-            <span style="opacity:0.6">{st.session_state.username}</span>
-        </div>
-    </div>
-    '''
+    with col_status:
+        badge_color = "#16a34a" if agents_running else "#dc2626"
+        status_text = "AKTYWNI" if agents_running else "STOP"
+        st.markdown(
+            f'<div style="text-align:right;padding:8px 0;">'
+            f'<span style="background:{badge_color};color:white;padding:4px 12px;border-radius:12px;'
+            f'font-size:11px;font-weight:600;text-transform:uppercase;">{status_text}</span>'
+            f'<span style="color:#94a3b8;font-size:13px;margin-left:12px;">{st.session_state.username}</span>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
     
-    st.markdown(nav_html, unsafe_allow_html=True)
+    st.markdown("---")
 
 
 # 
