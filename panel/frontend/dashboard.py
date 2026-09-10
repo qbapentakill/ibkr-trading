@@ -35,49 +35,53 @@ st.markdown("""
         top: 0;
         left: 0;
         right: 0;
-        background: rgba(0, 0, 0, 0.8);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        background: #000000;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 0 24px;
-        height: 48px;
+        padding: 0 32px;
+        height: 44px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         z-index: 9999;
     }
     .top-nav-logo {
-        font-size: 15px;
+        font-size: 16px;
         font-weight: 600;
         color: #f5f5f7;
         letter-spacing: -0.3px;
+        min-width: 180px;
     }
     .top-nav-menu {
         display: flex;
-        gap: 32px;
+        gap: 28px;
         align-items: center;
+        flex: 1;
+        justify-content: center;
     }
     .top-nav-item {
-        font-size: 13px;
+        font-size: 14px;
         color: #f5f5f7;
         text-decoration: none;
         opacity: 0.8;
         transition: opacity 0.2s;
         cursor: pointer;
         padding: 4px 0;
+        white-space: nowrap;
     }
     .top-nav-item:hover {
         opacity: 1;
     }
     .top-nav-item.active {
         opacity: 1;
-        font-weight: 500;
+        font-weight: 600;
     }
     .top-nav-status {
         display: flex;
         align-items: center;
         gap: 12px;
         font-size: 12px;
+        min-width: 180px;
+        justify-content: flex-end;
     }
     .status-badge {
         padding: 4px 10px;
@@ -101,9 +105,9 @@ st.markdown("""
         background: #0a0a0a;
         color: #f5f5f7;
         font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Text', sans-serif;
-        padding-top: 48px;
+        padding-top: 44px;
     }
-    .main .block-container { padding: 4rem 3rem 2rem 3rem; max-width: 100%; }
+    .main .block-container { padding: 5rem 3rem 2rem 3rem; max-width: 100%; }
 
     /*  Ticker bar  */
     .ticker-wrapper {
