@@ -701,53 +701,96 @@ PAGES = {
 }
 
 def render_top_nav() -> None:
-    """Renderuje górną nawigację - buttony w kolumnach"""
+    """Minimalistyczna nawigacja w stylu Apple z dropdown."""
     status = _get_status() if st.session_state.logged_in else {}
     agents_running = status.get("agents_running", True) if status else True
-    
     current_page = st.session_state.get("active_page", "Dashboard")
     
-    # Render status bar
-    col_logo, col_menu, col_status = st.columns([1, 6, 2])
+    # Główne zakładki (zawsze widoczne - małe przyciski)
+    main_pages = [
+        ("Dashboard", "Dashboard"),
+        ("Agenci", "Agenci"),
+        ("Pozycje", "Pozycje"),
+        ("Transakcje", "Transakcje"),
+        ("Sygnały", "Sygnały"),
+        ("Wydajność", "Wydajność"),
+        ("Szef", "Szef"),
+    ]
     
+    # Dodatkowe zakładki (w dropdown)
+    more_pages = [
+        ("Ryzyko", "Ryzyko"),
+        ("Newsy", "Newsy"),
+        ("AI Chat", "AI Chat"),
+        ("Paper Session", "Paper Session"),
+        ("Backtester", "Backtester"),
+        ("Fundamentals", "Fundamentals"),
+        ("Rynki", "Rynki"),
+        ("Krypto", "Krypto"),
+        ("Logi", "Logi"),
+    ]
+    if not _is_viewer():
+        more_pages += [("Użytkownicy", "Uzytkownicy"), ("Emergency", "Emergency")]
+    
+    # Layout
+    col_logo, col_nav, col_more, col_status = st.columns([1.2, 5.5, 1.3, 1.5])
+    
+    # Logo
     with col_logo:
-        st.markdown("### IBKR Trading")
+        st.markdown("<div style='padding:6px 0;font-weight:600;font-size:14px;color:#f5f5f7;'>⚡ IBKR Trading</div>", unsafe_allow_html=True)
     
-    with col_menu:
-        # Main pages
-        menu_cols = st.columns(9)
-        pages_main = [
-            ("Dashboard", "Dashboard"),
-            ("Agenci", "Agenci"),
-            ("Pozycje", "Pozycje"),
-            ("Transakcje", "Transakcje"),
-            ("Sygnały", "Sygnały"),
-            ("Ryzyko", "Ryzyko"),
-            ("Wydajność", "Wydajność"),
-            ("Szef", "Szef"),
-            ("Więcej", None),  # dropdown placeholder
-        ]
+    # Główne przyciski (małe, płaskie)
+    with col_nav:
+        nav_cols = st.columns(len(main_pages))
+        for i, (label, key) in enumerate(main_pages):
+            with nav_cols[i]:
+                is_active = key == current_page
+                if is_active:
+                    # Aktywna zakładka - primary button ale mniejszy
+                    st.markdown(f"<div style='text-align:center;padding:8px 0;'><span style='color:#3b82f6;font-weight:600;font-size:12px;border-bottom:2px solid #3b82f6;padding-bottom:6px;'>{label}</span></div>", unsafe_allow_html=True)
+                else:
+                    if st.button(label, key=f"nav_{key}", use_container_width=True):
+                        st.session_state.active_page = key
+                        st.rerun()
+    
+    # Dropdown "Więcej"
+    with col_more:
+        more_labels = [label for label, _ in more_pages]
+        current_in_more = any(key == current_page for _, key in more_pages)
+        default_idx = 0
+        if current_in_more:
+            for idx, (label, key) in enumerate(more_pages):
+                if key == current_page:
+                    default_idx = idx + 1
+                    break
         
-        for i, (label, key) in enumerate(pages_main):
-            if key and not (_is_viewer() and key in ("Ryzyko",)):
-                btn_type = "primary" if key == current_page else "secondary"
-                if menu_cols[i].button(label, key=f"nav_{key}", use_container_width=True, type=btn_type):
+        selected = st.selectbox(
+            "More",
+            ["Więcej ▾"] + more_labels,
+            index=default_idx,
+            key="nav_dropdown",
+            label_visibility="collapsed"
+        )
+        if selected != "Więcej ▾":
+            for label, key in more_pages:
+                if label == selected:
                     st.session_state.active_page = key
                     st.rerun()
+                    break
     
+    # Status + user
     with col_status:
         badge_color = "#16a34a" if agents_running else "#dc2626"
-        status_text = "AKTYWNI" if agents_running else "STOP"
+        status_text = "●" if agents_running else "●"
         st.markdown(
-            f'<div style="text-align:right;padding:8px 0;">'
-            f'<span style="background:{badge_color};color:white;padding:4px 12px;border-radius:12px;'
-            f'font-size:11px;font-weight:600;text-transform:uppercase;">{status_text}</span>'
-            f'<span style="color:#94a3b8;font-size:13px;margin-left:12px;">{st.session_state.username}</span>'
+            f'<div style="text-align:right;padding:8px 0;font-size:12px;">'
+            f'<span style="color:{badge_color};margin-right:8px;">{status_text}</span>'
+            f'<span style="color:#86efac;font-weight:500;">{st.session_state.username}</span>'
             f'</div>',
             unsafe_allow_html=True
         )
     
-    st.markdown("---")
+    st.markdown("<div style='border-bottom:1px solid rgba(255,255,255,0.1);margin:8px 0 24px 0;'></div>", unsafe_allow_html=True)
 
 
 # 
