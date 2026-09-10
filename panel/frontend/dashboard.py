@@ -1453,8 +1453,10 @@ def page_performance() -> None:
                         })
                         if r and r.get("ok"):
                             st.success(f" Szef otrzymał raport dla {agent} i wyciągnie konsekwencje!")
+                        elif r and r.get("error"):
+                            st.error(f"Błąd: {r['error']}")
                         else:
-                            st.error("Błąd — sprawdź połączenie z API")
+                            st.error("Błąd — sprawdź połączenie z API lub zaloguj się ponownie")
 
 
 def page_news() -> None:
