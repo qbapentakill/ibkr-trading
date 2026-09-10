@@ -624,45 +624,45 @@ PAGES = {
 
 def render_sidebar() -> None:
     with st.sidebar:
-        st.markdown(f"###  {st.session_state.username}")
+        st.markdown(f"### {st.session_state.username}")
         if _is_viewer():
             st.markdown(
                 '<div style="background:#1e3a5f;border:1px solid #3b82f6;border-radius:8px;'
                 'padding:6px;text-align:center;margin-bottom:8px;">'
-                '<span style="color:#93c5fd;font-size:12px;font-weight:600;"> TRYB PODGLĄDU</span>'
+                '<span style="color:#93c5fd;font-size:12px;font-weight:600;">TRYB PODGLĄDU</span>'
                 '</div>',
                 unsafe_allow_html=True,
             )
         st.markdown("---")
 
-        #  Przycisk ON/OFF agentów 
+        # Przycisk ON/OFF agentów
         status = _get_status()
         agents_running = status.get("agents_running", True) if status else True
 
         if agents_running:
             st.markdown(
-                '<div style="background:#052e16;border:1px solid #16a34a;border-radius:10px;'
-                'padding:10px;text-align:center;margin-bottom:8px;">'
-                '<span style="color:#4ade80;font-weight:700;font-size:13px;"> AGENCI AKTYWNI</span>'
+                '<div style="background:#16a34a;border:none;border-radius:8px;'
+                'padding:14px;text-align:center;margin-bottom:16px;cursor:pointer;">'
+                '<span style="color:#ffffff;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">AGENCI AKTYWNI</span>'
                 '</div>',
                 unsafe_allow_html=True,
             )
             if not _is_viewer():
-                if st.button("⏹ ZATRZYMAJ AGENTÓW", use_container_width=True, key="toggle_agents"):
+                if st.button("ZATRZYMAJ AGENTÓW", use_container_width=True, key="toggle_agents", type="secondary"):
                     r = _post("/agents/stop-all", {})
                     if r:
                         st.success("Agenci zatrzymani")
                         st.rerun()
         else:
             st.markdown(
-                '<div style="background:#1c0a0a;border:1px solid #dc2626;border-radius:10px;'
-                'padding:10px;text-align:center;margin-bottom:8px;">'
-                '<span style="color:#f87171;font-weight:700;font-size:13px;">⏸ AGENCI ZATRZYMANI</span>'
+                '<div style="background:#dc2626;border:none;border-radius:8px;'
+                'padding:14px;text-align:center;margin-bottom:16px;">'
+                '<span style="color:#ffffff;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">AGENCI ZATRZYMANI</span>'
                 '</div>',
                 unsafe_allow_html=True,
             )
             if not _is_viewer():
-                if st.button(" URUCHOM AGENTÓW", use_container_width=True, key="toggle_agents"):
+                if st.button("URUCHOM AGENTÓW", use_container_width=True, key="toggle_agents", type="primary"):
                     r = _post("/agents/start-all", {})
                     if r:
                         st.success("Agenci uruchomieni")
@@ -677,7 +677,7 @@ def render_sidebar() -> None:
             if st.button(label, use_container_width=True, key=f"nav_{key}"):
                 st.session_state.active_page = key
         st.markdown("---")
-        if st.button(" Wyloguj", use_container_width=True):
+        if st.button("Wyloguj", use_container_width=True):
             st.session_state.logged_in = False
             st.session_state.token     = None
             st.rerun()
