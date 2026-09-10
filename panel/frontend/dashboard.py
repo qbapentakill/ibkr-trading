@@ -16,7 +16,7 @@ st.set_page_config(
     page_title="IBKR Trading System",
     page_icon="",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 # 
@@ -26,13 +26,84 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=SF+Mono:wght@400;500&display=swap');
 
+    /* Ukryj sidebar */
+    [data-testid="stSidebar"] { display: none; }
+    
+    /* Górna nawigacja */
+    .top-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 0 24px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 9999;
+    }
+    .top-nav-logo {
+        font-size: 15px;
+        font-weight: 600;
+        color: #f5f5f7;
+        letter-spacing: -0.3px;
+    }
+    .top-nav-menu {
+        display: flex;
+        gap: 32px;
+        align-items: center;
+    }
+    .top-nav-item {
+        font-size: 13px;
+        color: #f5f5f7;
+        text-decoration: none;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+        cursor: pointer;
+        padding: 4px 0;
+    }
+    .top-nav-item:hover {
+        opacity: 1;
+    }
+    .top-nav-item.active {
+        opacity: 1;
+        font-weight: 500;
+    }
+    .top-nav-status {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 12px;
+    }
+    .status-badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .status-active {
+        background: #16a34a;
+        color: white;
+    }
+    .status-inactive {
+        background: #dc2626;
+        color: white;
+    }
+
     /*  Tło i font (Apple dark)  */
     .stApp {
         background: #0a0a0a;
         color: #f5f5f7;
         font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Text', sans-serif;
+        padding-top: 48px;
     }
-    .main .block-container { padding: 1rem 3rem 2rem 3rem; max-width: 100%; }
+    .main .block-container { padding: 4rem 3rem 2rem 3rem; max-width: 100%; }
 
     /*  Ticker bar  */
     .ticker-wrapper {
@@ -622,65 +693,45 @@ PAGES = {
     "Emergency Stop":  "Emergency",
 }
 
-def render_sidebar() -> None:
-    with st.sidebar:
-        st.markdown(f"### {st.session_state.username}")
-        if _is_viewer():
-            st.markdown(
-                '<div style="background:#1e3a5f;border:1px solid #3b82f6;border-radius:8px;'
-                'padding:6px;text-align:center;margin-bottom:8px;">'
-                '<span style="color:#93c5fd;font-size:12px;font-weight:600;">TRYB PODGLĄDU</span>'
-                '</div>',
-                unsafe_allow_html=True,
-            )
-        st.markdown("---")
-
-        # Przycisk ON/OFF agentów
-        status = _get_status()
-        agents_running = status.get("agents_running", True) if status else True
-
-        if agents_running:
-            st.markdown(
-                '<div style="background:#16a34a;border:none;border-radius:8px;'
-                'padding:14px;text-align:center;margin-bottom:16px;cursor:pointer;">'
-                '<span style="color:#ffffff;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">AGENCI AKTYWNI</span>'
-                '</div>',
-                unsafe_allow_html=True,
-            )
-            if not _is_viewer():
-                if st.button("ZATRZYMAJ AGENTÓW", use_container_width=True, key="toggle_agents", type="secondary"):
-                    r = _post("/agents/stop-all", {})
-                    if r:
-                        st.success("Agenci zatrzymani")
-                        st.rerun()
-        else:
-            st.markdown(
-                '<div style="background:#dc2626;border:none;border-radius:8px;'
-                'padding:14px;text-align:center;margin-bottom:16px;">'
-                '<span style="color:#ffffff;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">AGENCI ZATRZYMANI</span>'
-                '</div>',
-                unsafe_allow_html=True,
-            )
-            if not _is_viewer():
-                if st.button("URUCHOM AGENTÓW", use_container_width=True, key="toggle_agents", type="primary"):
-                    r = _post("/agents/start-all", {})
-                    if r:
-                        st.success("Agenci uruchomieni")
-                        st.rerun()
-
-        st.markdown("---")
-
-        for label, key in PAGES.items():
-            # Viewer widzi tylko podgląd — bez zakładek sterowania
-            if _is_viewer() and key in ("Ryzyko", "Backtester", "AI Chat", "Logi", "Emergency", "Uzytkownicy"):
-                continue
-            if st.button(label, use_container_width=True, key=f"nav_{key}"):
-                st.session_state.active_page = key
-        st.markdown("---")
-        if st.button("Wyloguj", use_container_width=True):
-            st.session_state.logged_in = False
-            st.session_state.token     = None
-            st.rerun()
+def render_top_nav() -> None:
+    """Renderuje górną nawigację w stylu Apple.com"""
+    status = _get_status() if st.session_state.logged_in else {}
+    agents_running = status.get("agents_running", True) if status else True
+    
+    # Pobierz aktualną stronę z query params lub session_state
+    if "page" in st.query_params:
+        st.session_state.active_page = st.query_params["page"]
+    
+    current_page = st.session_state.get("active_page", "Dashboard")
+    
+    # Status badge
+    status_class = "status-active" if agents_running else "status-inactive"
+    status_text = "AKTYWNI" if agents_running else "ZATRZYMANI"
+    
+    # Menu items
+    menu_items = []
+    for label, key in PAGES.items():
+        if _is_viewer() and key in ("Ryzyko", "Backtester", "AI Chat", "Logi", "Emergency", "Uzytkownicy"):
+            continue
+        active_class = "active" if key == current_page else ""
+        menu_items.append(f'<a class="top-nav-item {active_class}" href="?page={key}">{label}</a>')
+    
+    menu_html = "\n".join(menu_items)
+    
+    nav_html = f'''
+    <div class="top-nav">
+        <div class="top-nav-logo">IBKR Trading System</div>
+        <div class="top-nav-menu">
+            {menu_html}
+        </div>
+        <div class="top-nav-status">
+            <span class="status-badge {status_class}">{status_text}</span>
+            <span style="opacity:0.6">{st.session_state.username}</span>
+        </div>
+    </div>
+    '''
+    
+    st.markdown(nav_html, unsafe_allow_html=True)
 
 
 # 
@@ -3288,7 +3339,7 @@ def main() -> None:
 
     _render_ticker()
     _render_header()
-    render_sidebar()
+    render_top_nav()
 
     page = st.session_state.active_page
     dispatch = {
