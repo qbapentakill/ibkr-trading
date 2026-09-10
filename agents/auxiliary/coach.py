@@ -306,7 +306,7 @@ class CoachAgent:
 
     # ── Wewnętrzne ────────────────────────────────────────────────────────────
 
-    def _calculate_points(self, pnl_pct: float) -> int:
+    def _calculate_points(self, pnl_pct: float, agent_level: str = "🥚 Nowicjusz") -> int:
         """Przelicza % PnL na punkty z uwzględnieniem poziomu agenta."""
         # Mnożnik trudności per poziom — im wyższy poziom, tym trudniej
         level_multipliers = {
