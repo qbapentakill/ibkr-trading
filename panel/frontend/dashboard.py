@@ -1473,7 +1473,7 @@ Odpowiadaj po POLSKU. Bądź konkretny, pomocny i profesjonalny jak doświadczon
         resp = _req.post(
             "https://api.groq.com/openai/v1/chat/completions",
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-            json={"model": "llama3-70b-8192", "messages": messages, "temperature": 0.4, "max_tokens": 2000},
+            json={"model": "llama-3.3-70b-versatile", "messages": messages, "temperature": 0.4, "max_tokens": 2000},
             timeout=30,
         )
         data = resp.json()
