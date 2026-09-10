@@ -522,7 +522,10 @@ def _post(path: str, data: dict) -> dict | None:
             f"{st.session_state.api_base}{path}",
             json=data, headers=_headers(), timeout=5
         )
-        return r.json()
+        if r.status_code == 200:
+            return r.json()
+        else:
+            return {"error": f"HTTP {r.status_code}: {r.text[:200]}"}
     except Exception as e:
         return {"error": str(e)}
 
