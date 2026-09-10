@@ -1,4 +1,4 @@
-"""
+﻿"""
 Panel sterowania – IBKR Multi-Agent Trading System
 Streamlit dashboard z ciemnym motywem.
 
@@ -9,32 +9,32 @@ from __future__ import annotations
 
 import streamlit as st
 
-# ══════════════════════════════════════════════════════════════════════════════
+# 
 # Konfiguracja strony (MUSI być pierwsza komenda Streamlit)
-# ══════════════════════════════════════════════════════════════════════════════
+# 
 st.set_page_config(
     page_title="IBKR Trading System",
-    page_icon="📈",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# ══════════════════════════════════════════════════════════════════════════════
-# CSS – nowoczesny ciemny motyw (Bloomberg/TradingView style)
-# ══════════════════════════════════════════════════════════════════════════════
+# 
+# CSS – Apple dark mode (macOS style)
+# 
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=SF+Mono:wght@400;500&display=swap');
 
-    /* ── Tło i font ─────────────────────────────────────── */
+    /*  Tło i font (Apple dark)  */
     .stApp {
-        background: linear-gradient(135deg, #080c14 0%, #0d1321 50%, #080c14 100%);
-        color: #e2e8f0;
-        font-family: 'Inter', sans-serif;
+        background: #0a0a0a;
+        color: #f5f5f7;
+        font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Text', sans-serif;
     }
-    .main .block-container { padding: 0 2rem 2rem 2rem; max-width: 100%; }
+    .main .block-container { padding: 1rem 3rem 2rem 3rem; max-width: 100%; }
 
-    /* ── Ticker bar ──────────────────────────────────────── */
+    /*  Ticker bar  */
     .ticker-wrapper {
         background: linear-gradient(90deg, #0d1321, #111827, #0d1321);
         border-bottom: 1px solid #1e3a5f;
@@ -70,7 +70,7 @@ st.markdown("""
     .ticker-up     { color: #34d399; }
     .ticker-down   { color: #f87171; }
 
-    /* ── Header logo ────────────────────────────────────── */
+    /*  Header logo  */
     .app-header {
         display: flex;
         align-items: center;
@@ -99,7 +99,7 @@ st.markdown("""
         text-transform: uppercase;
     }
 
-    /* ── Sidebar ─────────────────────────────────────────── */
+    /*  Sidebar  */
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #0d1321 0%, #080c14 100%);
         border-right: 1px solid #1e3a5f;
@@ -122,7 +122,7 @@ st.markdown("""
         border-left: 2px solid #3b82f6;
     }
 
-    /* ── Karty metryki ───────────────────────────────────── */
+    /*  Karty metryki  */
     [data-testid="metric-container"] {
         background: linear-gradient(135deg, #111827, #1a2744);
         border: 1px solid #1e3a5f;
@@ -140,7 +140,7 @@ st.markdown("""
     [data-testid="stMetricValue"] { color: #e2e8f0; font-weight: 700; font-size: 24px; }
     [data-testid="stMetricDelta"] { font-size: 12px; }
 
-    /* ── Karty agentów ───────────────────────────────────── */
+    /*  Karty agentów  */
     .agent-card {
         background: linear-gradient(135deg, #111827, #1a2744);
         border: 1px solid #1e3a5f;
@@ -168,7 +168,7 @@ st.markdown("""
     .agent-status-error   { color: #f87171; font-size: 12px; }
     .agent-status-idle    { color: #64748b; font-size: 12px; }
 
-    /* ── Sygnały ─────────────────────────────────────────── */
+    /*  Sygnały  */
     .signal-card {
         background: #111827;
         border: 1px solid #1e3a5f;
@@ -186,14 +186,14 @@ st.markdown("""
     .signal-dir-long  { color: #34d399; font-weight: 700; font-size: 13px; }
     .signal-dir-short { color: #f87171; font-weight: 700; font-size: 13px; }
 
-    /* ── Tabele ──────────────────────────────────────────── */
+    /*  Tabele  */
     .stDataFrame { border-radius: 10px; overflow: hidden; }
     [data-testid="stDataFrameResizable"] {
         border: 1px solid #1e3a5f;
         border-radius: 10px;
     }
 
-    /* ── Przyciski ───────────────────────────────────────── */
+    /*  Przyciski  */
     .stButton button {
         background: linear-gradient(135deg, #1d4ed8, #1e40af);
         color: white;
@@ -209,7 +209,7 @@ st.markdown("""
         transform: translateY(-1px);
     }
 
-    /* ── Emergency button ────────────────────────────────── */
+    /*  Emergency button  */
     .emergency-btn button {
         background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
         color: white !important;
@@ -221,12 +221,12 @@ st.markdown("""
         box-shadow: 0 0 20px rgba(220,38,38,0.4);
     }
 
-    /* ── Badges ──────────────────────────────────────────── */
+    /*  Badges  */
     .badge-active   { color: #34d399; font-weight: 600; font-size: 12px; }
     .badge-error    { color: #f87171; font-weight: 600; font-size: 12px; }
     .badge-disabled { color: #475569; font-weight: 600; font-size: 12px; }
 
-    /* ── AI Chat ─────────────────────────────────────────── */
+    /*  AI Chat  */
     .chat-user {
         background: linear-gradient(135deg, #1d4ed822, #1e40af22);
         border: 1px solid #1d4ed844;
@@ -245,22 +245,22 @@ st.markdown("""
     }
     .chat-container { max-height: 450px; overflow-y: auto; }
 
-    /* ── Nagłówki ────────────────────────────────────────── */
+    /*  Nagłówki  */
     h1 { font-size: 22px !important; font-weight: 700 !important; color: #e2e8f0 !important; }
     h2 { font-size: 17px !important; font-weight: 600 !important; color: #cbd5e1 !important; }
     h3 { font-size: 15px !important; font-weight: 600 !important; color: #94a3b8 !important; }
 
-    /* ── Separator ───────────────────────────────────────── */
+    /*  Separator  */
     hr { border: none; border-top: 1px solid #1e3a5f; margin: 16px 0; }
 
-    /* ── Expander ────────────────────────────────────────── */
+    /*  Expander  */
     [data-testid="stExpander"] {
         background: #111827;
         border: 1px solid #1e3a5f;
         border-radius: 10px;
     }
 
-    /* ── Input ───────────────────────────────────────────── */
+    /*  Input  */
     .stTextInput input, .stSelectbox select, .stNumberInput input {
         background: #111827 !important;
         border: 1px solid #1e3a5f !important;
@@ -268,13 +268,13 @@ st.markdown("""
         border-radius: 8px !important;
     }
 
-    /* ── Scrollbar ───────────────────────────────────────── */
+    /*  Scrollbar  */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #0d1321; }
     ::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
 
-    /* ── Login page ──────────────────────────────────────── */
+    /*  Login page  */
     .login-card {
         background: linear-gradient(135deg, #111827, #1a2744);
         border: 1px solid #1e3a5f;
@@ -283,7 +283,7 @@ st.markdown("""
         box-shadow: 0 20px 60px rgba(0,0,0,0.5);
     }
 
-    /* ── Ticker ───────────────────────────────────────────── */
+    /*  Ticker  */
     .ticker-wrapper {
         width: 100%;
         overflow: hidden;
@@ -319,9 +319,9 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# 
 # Session state – inicjalizacja
-# ══════════════════════════════════════════════════════════════════════════════
+# 
 def _init_session() -> None:
     defaults = {
         "logged_in":    False,
@@ -338,16 +338,16 @@ def _init_session() -> None:
 _init_session()
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# 
 # HTTP helper
-# ══════════════════════════════════════════════════════════════════════════════
+# 
 import requests
 import random
 import time as _time
 from datetime import timezone as _tz
 import datetime as _datetime_module
 
-# ── Konwersja czasu UTC → Polska ──────────────────────────────────────────────
+#  Konwersja czasu UTC → Polska 
 _POLAND_OFFSET = _datetime_module.timedelta(hours=2)  # UTC+2 lato / UTC+1 zima
 
 def _to_poland_time(dt) -> _datetime_module.datetime:
@@ -430,7 +430,7 @@ def _page_autorefresh(page_key: str, default: str = "30s") -> None:
     col1, col2 = st.columns([6, 1])
     with col2:
         selected = st.selectbox(
-            "🔄",
+            "",
             options=list(_REFRESH_OPTIONS.keys()),
             index=list(_REFRESH_OPTIONS.keys()).index(st.session_state[key]),
             key=f"sel_{page_key}",
@@ -462,14 +462,14 @@ def _put(path: str, data: dict) -> dict | None:
         return {"error": str(e)}
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# 
 # Strona logowania
-# ══════════════════════════════════════════════════════════════════════════════
+# 
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# 
 # Ticker bar + Header
-# ══════════════════════════════════════════════════════════════════════════════
+# 
 
 _TICKER_DATA = [
     # ETF-y
@@ -541,14 +541,14 @@ def _render_header() -> None:
     with col_logo:
         st.markdown(
             '<span style="font-size:22px;font-weight:700;background:linear-gradient(135deg,#3b82f6,#06b6d4);'
-            '-webkit-background-clip:text;-webkit-text-fill-color:transparent;">⚡ IBKR Trading System</span>'
+            '-webkit-background-clip:text;-webkit-text-fill-color:transparent;"> IBKR Trading System</span>'
             '&nbsp;&nbsp;<span style="color:#475569;font-size:12px;">Multi-Agent AI</span>',
             unsafe_allow_html=True,
         )
     with col_right:
         mode_color = "#34d399" if paper_mode else "#ef4444"
-        mode_text  = "📄 PAPER" if paper_mode else "🔴 REAL"
-        estop_text = "  🚨 E-STOP" if estop else ""
+        mode_text  = " PAPER" if paper_mode else " REAL"
+        estop_text = "   E-STOP" if estop else ""
         st.markdown(
             f'<div style="text-align:right;font-size:12px;">'
             f'<span style="color:{mode_color};font-weight:600;">{mode_text}</span>'
@@ -567,7 +567,7 @@ def page_login() -> None:
         st.markdown("""
         <div class="login-card">
             <div style="text-align:center;margin-bottom:24px;">
-                <div style="font-size:48px;">⚡</div>
+                <div style="font-size:48px;"></div>
                 <div style="font-size:24px;font-weight:700;background:linear-gradient(135deg,#3b82f6,#06b6d4);
                     -webkit-background-clip:text;-webkit-text-fill-color:transparent;">
                     IBKR Trading System
@@ -577,10 +577,10 @@ def page_login() -> None:
         </div>
         """, unsafe_allow_html=True)
         st.markdown("")
-        username = st.text_input("👤 Login", value="admin", placeholder="Nazwa użytkownika")
-        password = st.text_input("🔒 Hasło", type="password", placeholder="Hasło")
+        username = st.text_input(" Login", value="admin", placeholder="Nazwa użytkownika")
+        password = st.text_input(" Hasło", type="password", placeholder="Hasło")
         st.markdown("")
-        if st.button("🚀 Zaloguj się", use_container_width=True, type="primary"):
+        if st.button(" Zaloguj się", use_container_width=True, type="primary"):
             try:
                 r = requests.post(
                     f"{st.session_state.api_base}/auth/token",
@@ -593,49 +593,49 @@ def page_login() -> None:
                     st.session_state.username  = username
                     st.rerun()
                 else:
-                    st.error("❌ Nieprawidłowy login lub hasło")
+                    st.error(" Nieprawidłowy login lub hasło")
             except Exception as e:
-                st.warning(f"⚠️ Nie można połączyć z API: {e}\n\nUruchom system: `python main.py`")
+                st.warning(f" Nie można połączyć z API: {e}\n\nUruchom system: `python main.py`")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# 
 # Sidebar nawigacja
-# ══════════════════════════════════════════════════════════════════════════════
+# 
 PAGES = {
-    "📊 Dashboard":       "Dashboard",
-    "🤖 Agenci":          "Agenci",
-    "📋 Pozycje":         "Pozycje",
-    "💱 Transakcje":      "Transakcje",
-    "📡 Sygnały":         "Sygnały",
-    "⚠️  Ryzyko":         "Ryzyko",
-    "📈 Wydajność":       "Wydajność",
-    "🏆 Szef / Ranking":  "Szef",
-    "₿ Krypto":           "Krypto",
-    "🌍 Rynki":           "Rynki",
-    "📊 Fundamenty":      "Fundamenty",
-    "📰 Newsy":           "Newsy",
-    "🔬 Backtester":      "Backtester",
-    "🧪 Sesja Testowa":   "SesjaTestowa",
-    "🤖 AI Chat":         "AI Chat",
-    "📜 Logi":            "Logi",
-    "👥 Użytkownicy":     "Uzytkownicy",
-    "🚨 Emergency Stop":  "Emergency",
+    "Dashboard":       "Dashboard",
+    "Agenci":          "Agenci",
+    "Pozycje":         "Pozycje",
+    "Transakcje":      "Transakcje",
+    "Sygnały":         "Sygnały",
+    "Ryzyko":         "Ryzyko",
+    "Wydajność":       "Wydajność",
+    "Szef / Ranking":  "Szef",
+    "Krypto":           "Krypto",
+    "Rynki":           "Rynki",
+    "Fundamenty":      "Fundamenty",
+    "Newsy":           "Newsy",
+    "Backtester":      "Backtester",
+    "Sesja Testowa":   "SesjaTestowa",
+    "AI Chat":         "AI Chat",
+    "Logi":            "Logi",
+    "Użytkownicy":     "Uzytkownicy",
+    "Emergency Stop":  "Emergency",
 }
 
 def render_sidebar() -> None:
     with st.sidebar:
-        st.markdown(f"### 👤 {st.session_state.username}")
+        st.markdown(f"###  {st.session_state.username}")
         if _is_viewer():
             st.markdown(
                 '<div style="background:#1e3a5f;border:1px solid #3b82f6;border-radius:8px;'
                 'padding:6px;text-align:center;margin-bottom:8px;">'
-                '<span style="color:#93c5fd;font-size:12px;font-weight:600;">👁️ TRYB PODGLĄDU</span>'
+                '<span style="color:#93c5fd;font-size:12px;font-weight:600;"> TRYB PODGLĄDU</span>'
                 '</div>',
                 unsafe_allow_html=True,
             )
         st.markdown("---")
 
-        # ── Przycisk ON/OFF agentów ───────────────────────────────────────────
+        #  Przycisk ON/OFF agentów 
         status = _get_status()
         agents_running = status.get("agents_running", True) if status else True
 
@@ -643,12 +643,12 @@ def render_sidebar() -> None:
             st.markdown(
                 '<div style="background:#052e16;border:1px solid #16a34a;border-radius:10px;'
                 'padding:10px;text-align:center;margin-bottom:8px;">'
-                '<span style="color:#4ade80;font-weight:700;font-size:13px;">⚡ AGENCI AKTYWNI</span>'
+                '<span style="color:#4ade80;font-weight:700;font-size:13px;"> AGENCI AKTYWNI</span>'
                 '</div>',
                 unsafe_allow_html=True,
             )
             if not _is_viewer():
-                if st.button("⏹️ ZATRZYMAJ AGENTÓW", use_container_width=True, key="toggle_agents"):
+                if st.button("⏹ ZATRZYMAJ AGENTÓW", use_container_width=True, key="toggle_agents"):
                     r = _post("/agents/stop-all", {})
                     if r:
                         st.success("Agenci zatrzymani")
@@ -657,12 +657,12 @@ def render_sidebar() -> None:
             st.markdown(
                 '<div style="background:#1c0a0a;border:1px solid #dc2626;border-radius:10px;'
                 'padding:10px;text-align:center;margin-bottom:8px;">'
-                '<span style="color:#f87171;font-weight:700;font-size:13px;">⏸️ AGENCI ZATRZYMANI</span>'
+                '<span style="color:#f87171;font-weight:700;font-size:13px;">⏸ AGENCI ZATRZYMANI</span>'
                 '</div>',
                 unsafe_allow_html=True,
             )
             if not _is_viewer():
-                if st.button("▶️ URUCHOM AGENTÓW", use_container_width=True, key="toggle_agents"):
+                if st.button(" URUCHOM AGENTÓW", use_container_width=True, key="toggle_agents"):
                     r = _post("/agents/start-all", {})
                     if r:
                         st.success("Agenci uruchomieni")
@@ -677,26 +677,26 @@ def render_sidebar() -> None:
             if st.button(label, use_container_width=True, key=f"nav_{key}"):
                 st.session_state.active_page = key
         st.markdown("---")
-        if st.button("🔓 Wyloguj", use_container_width=True):
+        if st.button(" Wyloguj", use_container_width=True):
             st.session_state.logged_in = False
             st.session_state.token     = None
             st.rerun()
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# 
 # Strony
-# ══════════════════════════════════════════════════════════════════════════════
+# 
 
 def page_dashboard() -> None:
     _page_autorefresh("dashboard", "30s")
-    st.title("📊 Dashboard")
+    st.title("Dashboard")
 
-    # ── Pasek cenowy ──────────────────────────────────────────────────────────
+    #  Pasek cenowy 
     _render_price_bar()
 
     status = _get_status()
     if not status:
-        st.warning("⚠️ Brak połączenia z API. Uruchom `python main.py`")
+        st.warning(" Brak połączenia z API. Uruchom `python main.py`")
         _render_demo_dashboard()
         return
     _render_live_dashboard(status)
@@ -788,7 +788,7 @@ def _render_price_bar() -> None:
         f'<div style="background:#050a12;border:1px solid #1e3a5f;border-radius:8px;'
         f'padding:10px 16px;margin-bottom:16px;overflow-x:auto;white-space:nowrap;'
         f'font-size:13px;scrollbar-width:thin;">'
-        f'<span style="color:#34d399;margin-right:12px;font-size:11px;">● LIVE</span>'
+        f'<span style="color:#34d399;margin-right:12px;font-size:11px;"> LIVE</span>'
         f'{items}'
         f'</div>',
         unsafe_allow_html=True,
@@ -933,10 +933,10 @@ def _render_candle_charts() -> None:
 def _render_demo_dashboard() -> None:
     st.info("Tryb demonstracyjny – dane przykładowe")
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("💰 Kapitał",    "$10,000",  "+$0")
-    c2.metric("📈 Dzienny PnL","$0.00",    "0%")
-    c3.metric("📉 Drawdown",   "0.00%",    "")
-    c4.metric("📋 Pozycje",    "0",        "")
+    c1.metric(" Kapitał",    "$10,000",  "+$0")
+    c2.metric(" Dzienny PnL","$0.00",    "0%")
+    c3.metric(" Drawdown",   "0.00%",    "")
+    c4.metric("Pozycje",    "0",        "")
 
 
 def _render_live_dashboard(s: dict) -> None:
@@ -949,10 +949,10 @@ def _render_live_dashboard(s: dict) -> None:
     paper  = s.get("paper_mode", True)
 
     if estop:
-        st.error("🚨 EMERGENCY STOP AKTYWNY – system wstrzymany!")
+        st.error("Emergency Stop AKTYWNY – system wstrzymany!")
         st.markdown("---")
 
-    # ── Live metryki przez JS (aktualizowane co 2s bez przeładowania) ─────────
+    #  Live metryki przez JS (aktualizowane co 2s bez przeładowania) 
     pnl_color  = "#34d399" if pnl >= 0 else "#f87171"
     pnl_sign   = "+" if pnl >= 0 else ""
     api_base   = st.session_state.get("api_base", "http://localhost:8000/api")
@@ -961,24 +961,24 @@ def _render_live_dashboard(s: dict) -> None:
     st.markdown(f"""
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px;">
         <div style="background:#111827;border:1px solid #1e3a5f;border-radius:10px;padding:14px;">
-            <div style="color:#64748b;font-size:11px;text-transform:uppercase;">💰 Kapitał</div>
+            <div style="color:#64748b;font-size:11px;text-transform:uppercase;"> Kapitał</div>
             <div id="live-capital" style="color:#e2e8f0;font-size:22px;font-weight:700;">${cap:,.2f}</div>
         </div>
         <div style="background:#111827;border:1px solid #1e3a5f;border-radius:10px;padding:14px;">
-            <div style="color:#64748b;font-size:11px;text-transform:uppercase;">📈 Dzienny PnL</div>
+            <div style="color:#64748b;font-size:11px;text-transform:uppercase;"> Dzienny PnL</div>
             <div id="live-pnl" style="color:{pnl_color};font-size:22px;font-weight:700;">{pnl_sign}${pnl:,.2f}</div>
         </div>
         <div style="background:#111827;border:1px solid #1e3a5f;border-radius:10px;padding:14px;">
-            <div style="color:#64748b;font-size:11px;text-transform:uppercase;">📉 Drawdown</div>
+            <div style="color:#64748b;font-size:11px;text-transform:uppercase;"> Drawdown</div>
             <div id="live-drawdown" style="color:#fbbf24;font-size:22px;font-weight:700;">{dd:.2f}%</div>
         </div>
         <div style="background:#111827;border:1px solid #1e3a5f;border-radius:10px;padding:14px;">
-            <div style="color:#64748b;font-size:11px;text-transform:uppercase;">📋 Pozycje</div>
+            <div style="color:#64748b;font-size:11px;text-transform:uppercase;">Pozycje</div>
             <div id="live-positions" style="color:#93c5fd;font-size:22px;font-weight:700;">{n_pos}</div>
         </div>
         <div style="background:#111827;border:1px solid #1e3a5f;border-radius:10px;padding:14px;">
-            <div style="color:#64748b;font-size:11px;text-transform:uppercase;">🔧 Tryb</div>
-            <div style="color:{'#4ade80' if paper else '#ef4444'};font-size:18px;font-weight:700;">{'📄 PAPER' if paper else '🔴 REAL'}</div>
+            <div style="color:#64748b;font-size:11px;text-transform:uppercase;"> Tryb</div>
+            <div style="color:{'#4ade80' if paper else '#ef4444'};font-size:18px;font-weight:700;">{' PAPER' if paper else ' REAL'}</div>
         </div>
     </div>
 
@@ -1025,7 +1025,7 @@ def _render_live_dashboard(s: dict) -> None:
     </script>
     """, unsafe_allow_html=True)
 
-    # ── Przełącznik Paper / Real ──────────────────────────────────────────────
+    #  Przełącznik Paper / Real 
     st.markdown("---")
     col_sw1, col_sw2, col_sw3 = st.columns([2, 1, 2])
     with col_sw2:
@@ -1038,32 +1038,32 @@ def _render_live_dashboard(s: dict) -> None:
             st.markdown(
                 '<div style="text-align:center;background:#052e16;border:1px solid #16a34a;'
                 'border-radius:10px;padding:8px;color:#4ade80;font-weight:700;font-size:13px;">'
-                '📄 PAPER TRADING</div>',
+                ' PAPER TRADING</div>',
                 unsafe_allow_html=True,
             )
             if not _is_viewer():
-                if st.button("🔄 Przełącz na REAL", use_container_width=True, key="switch_to_real"):
+                if st.button(" Przełącz na REAL", use_container_width=True, key="switch_to_real"):
                     r = _post("/trading-mode/real", {})
                     if r and r.get("ok"):
-                        st.warning("⚠️ Przełączono na REAL MONEY — zlecenia idą na prawdziwe konto!")
+                        st.warning(" Przełączono na REAL MONEY — zlecenia idą na prawdziwe konto!")
                         st.rerun()
         else:
             st.markdown(
                 '<div style="text-align:center;background:#3f0d0d;border:1px solid #dc2626;'
                 'border-radius:10px;padding:8px;color:#f87171;font-weight:700;font-size:13px;">'
-                '🔴 REAL TRADING</div>',
+                ' REAL TRADING</div>',
                 unsafe_allow_html=True,
             )
             if not _is_viewer():
-                if st.button("🔄 Przełącz na PAPER", use_container_width=True, key="switch_to_paper"):
+                if st.button(" Przełącz na PAPER", use_container_width=True, key="switch_to_paper"):
                     r = _post("/trading-mode/paper", {})
                     if r and r.get("ok"):
-                        st.success("✅ Przełączono na Paper Trading")
+                        st.success(" Przełączono na Paper Trading")
                         st.rerun()
 
     st.markdown("---")
 
-    # ── Wykresy świecowe ──────────────────────────────────────────────────────
+    #  Wykresy świecowe 
     _render_candle_charts()
 
     # Agenci – status grid
@@ -1073,7 +1073,7 @@ def _render_live_dashboard(s: dict) -> None:
     for i, (name, data) in enumerate(agents.items()):
         st_status = data["state"]["status"]
         alloc     = data["config"]["max_allocation_pct"]
-        icon  = "🟢" if st_status == "active" else "🔴" if st_status == "error" else "⚫"
+        icon  = "[●]" if st_status == "active" else "" if st_status == "error" else ""
         cls   = "agent-status-active" if st_status == "active" else "agent-status-error" if st_status == "error" else "agent-status-idle"
         with cols[i % 4]:
             st.markdown(f"""
@@ -1088,8 +1088,8 @@ def _render_live_dashboard(s: dict) -> None:
 
     st.markdown("---")
 
-    # ── Live sygnały przez JS ─────────────────────────────────────────────────
-    st.subheader("📡 Ostatnie sygnały — Live")
+    #  Live sygnały przez JS 
+    st.subheader(" Ostatnie sygnały — Live")
     st.markdown(f"""
     <div id="live-signals-container">
         <div style="color:#475569;padding:20px;text-align:center;">Ładowanie sygnałów...</div>
@@ -1122,7 +1122,7 @@ def _render_live_dashboard(s: dict) -> None:
                     const agent = (sig.agent_name || "").replace("AgentName.", "");
                     const isLong = dir === "LONG";
                     const color  = isLong ? "#34d399" : "#f87171";
-                    const arrow  = isLong ? "▲" : "▼";
+                    const arrow  = isLong ? "" : "";
                     const ts     = (sig.timestamp || "").substring(11,19);
                     html += `<div style="background:#0d1321;border-left:3px solid ${{color}};border-radius:0 6px 6px 0;padding:8px 12px;margin:3px 0;display:flex;align-items:center;gap:12px;">
                         <span style="color:${{color}};font-weight:700;min-width:70px">${{arrow}} ${{dir}}</span>
@@ -1145,9 +1145,9 @@ def _render_live_dashboard(s: dict) -> None:
 
 def page_agents() -> None:
     _page_autorefresh("agents", "30s")
-    st.title("🤖 Agenci")
+    st.title("Agenci")
     if _is_viewer():
-        st.info("👁️ Tryb podglądu — tylko odczyt")
+        st.info(" Tryb podglądu — tylko odczyt")
     agents = _get("/agents")
     if not agents:
         st.warning("Brak danych – sprawdź połączenie z API")
@@ -1193,9 +1193,9 @@ def page_agents() -> None:
     }
 
     for group_name, group_set, group_icon in [
-        ("Trading Boty", TRADING_AGENTS, "📈"),
-        ("Boty Pomocnicze", AUX_AGENTS, "🔧"),
-        ("System", SYSTEM_AGENTS, "⚙️"),
+        ("Trading Boty", TRADING_AGENTS, ""),
+        ("Boty Pomocnicze", AUX_AGENTS, ""),
+        ("System", SYSTEM_AGENTS, ""),
     ]:
         group_agents = {k: v for k, v in agents.items() if k in group_set}
         # Do Trading trafią też boty nieznane żadnej grupie
@@ -1209,8 +1209,8 @@ def page_agents() -> None:
         for name, data in group_agents.items():
                 cfg   = data["config"]
                 state = data["state"]
-                status_icon = "🟢" if state["status"] == "active" else \
-                              "🔴" if state["status"] == "error"  else "⚫"
+                status_icon = "[●]" if state["status"] == "active" else \
+                              "" if state["status"] == "error"  else ""
                 desc  = AGENT_DESC.get(name, "")
                 # Unikalny klucz per grupa + nazwa
                 key_prefix = f"{group_name}_{name}"
@@ -1236,7 +1236,7 @@ def page_agents() -> None:
                             key=f"risk_{key_prefix}"
                         )
                         if not _is_viewer():
-                            if st.button("💾 Zapisz zmiany", key=f"save_{key_prefix}"):
+                            if st.button(" Zapisz zmiany", key=f"save_{key_prefix}"):
                                 _put(f"/agents/{name}/config", {
                                     "max_allocation_pct":     alloc,
                                     "max_risk_per_trade_pct": risk_pt,
@@ -1256,7 +1256,7 @@ def page_agents() -> None:
 
 def page_positions() -> None:
     _page_autorefresh("positions", "30s")
-    st.title("📋 Otwarte pozycje")
+    st.title(" Otwarte pozycje")
     positions = _get("/positions")
     if not positions:
         st.info("Brak otwartych pozycji")
@@ -1280,7 +1280,7 @@ def page_positions() -> None:
 
 def page_signals() -> None:
     _page_autorefresh("signals", "30s")
-    st.title("📡 Sygnały agentów")
+    st.title("Sygnały agentów")
     signals = _get("/signals?limit=50")
     if not signals:
         st.info("Brak sygnałów w bazie danych")
@@ -1296,7 +1296,7 @@ def page_signals() -> None:
 
 
 def page_risk() -> None:
-    st.title("⚠️ Zarządzanie ryzykiem")
+    st.title(" Zarządzanie ryzykiem")
     limits = _get("/risk")
     if not limits:
         st.warning("Brak danych")
@@ -1330,7 +1330,7 @@ def page_risk() -> None:
         )
 
     if not _is_viewer():
-        if st.button("💾 Zapisz limity ryzyka", type="primary"):
+        if st.button(" Zapisz limity ryzyka", type="primary"):
             result = _put("/risk", {
                 "max_daily_loss_usd":    daily_loss,
                 "max_drawdown_pct":      drawdown,
@@ -1338,13 +1338,13 @@ def page_risk() -> None:
                 "max_position_size_pct": pos_size,
             })
             if result and result.get("ok"):
-                st.success("✅ Limity ryzyka zapisane")
+                st.success(" Limity ryzyka zapisane")
             else:
-                st.error("❌ Błąd zapisu")
+                st.error(" Błąd zapisu")
 
 
 def page_performance() -> None:
-    st.title("📈 Wydajność agentów")
+    st.title("Wydajność agentów")
     perf = _get("/performance")
     if not perf:
         st.info("Brak danych wydajnościowych (system musi być aktywny przez jakiś czas)")
@@ -1371,14 +1371,14 @@ def page_performance() -> None:
         issues  = report.get("issues", [])
         suggs   = report.get("suggestions", [])
         if issues:
-            with st.expander(f"⚠️ {agent}", expanded=True):
+            with st.expander(f" {agent}", expanded=True):
                 for i in issues:
                     st.warning(i)
                 for s in suggs:
-                    st.info(f"💡 {s}")
+                    st.info(f" {s}")
                 st.markdown("")
                 if not _is_viewer():
-                    if st.button(f"📨 Wyślij sugestie do Szefa — {agent}",
+                    if st.button(f" Wyślij sugestie do Szefa — {agent}",
                                  key=f"send_coach_{agent}", use_container_width=True):
                         # Wywołaj endpoint który wymusi ocenę przez CoachAgent
                         r = _post(f"/performance/send-to-coach/{agent}", {
@@ -1388,13 +1388,13 @@ def page_performance() -> None:
                             "profit_factor": report.get("profit_factor", 0),
                         })
                         if r and r.get("ok"):
-                            st.success(f"✅ Szef otrzymał raport dla {agent} i wyciągnie konsekwencje!")
+                            st.success(f" Szef otrzymał raport dla {agent} i wyciągnie konsekwencje!")
                         else:
                             st.error("Błąd — sprawdź połączenie z API")
 
 
 def page_news() -> None:
-    st.title("📰 Newsy rynkowe")
+    st.title("Newsy rynkowe")
     news = _get("/news?limit=30")
     if not news:
         st.info("Brak newsów (NewsAnalyst musi być aktywny)")
@@ -1402,7 +1402,7 @@ def page_news() -> None:
 
     for item in news:
         impact = item.get("impact", "LOW")
-        icon   = "🔴" if impact == "HIGH" else "🟡" if impact == "MEDIUM" else "⚪"
+        icon   = "" if impact == "HIGH" else "[●]" if impact == "MEDIUM" else ""
         pub    = item.get("published", "")
         if hasattr(pub, "strftime"):
             pub = pub.strftime("%H:%M")
@@ -1433,7 +1433,7 @@ def _groq_direct(message: str, history: list) -> str:
         except Exception:
             pass
     if not api_key:
-        return "❌ Brak klucza GROQ_API_KEY w .env"
+        return " Brak klucza GROQ_API_KEY w .env"
 
     # Pobierz kontekst systemu
     status = _get("/status") or {}
@@ -1480,14 +1480,14 @@ Odpowiadaj po POLSKU. Bądź konkretny, pomocny i profesjonalny jak doświadczon
         if resp.status_code == 200:
             return data["choices"][0]["message"]["content"]
         else:
-            return f"❌ Błąd Groq: {data.get('error', {}).get('message', str(data))}"
+            return f" Błąd Groq: {data.get('error', {}).get('message', str(data))}"
     except Exception as e:
-        return f"❌ Błąd połączenia z Groq: {e}"
+        return f" Błąd połączenia z Groq: {e}"
 
 
 def page_ai_chat() -> None:
-    st.title("🤖 AI Chat – asystent tradingowy")
-    st.caption("Pytaj o rynek, strategie, krypto, agentów — odpowiem na wszystko 🧠")
+    st.title("AI Chat – asystent tradingowy")
+    st.caption("Pytaj o rynek, strategie, krypto, agentów — odpowiem na wszystko ")
 
     # Historia czatu
     chat_container = st.container()
@@ -1495,12 +1495,12 @@ def page_ai_chat() -> None:
         for msg in st.session_state.chat_history:
             if msg["role"] == "user":
                 st.markdown(
-                    f'<div class="chat-user">👤 <b>Ty:</b> {msg["content"]}</div>',
+                    f'<div class="chat-user"> <b>Ty:</b> {msg["content"]}</div>',
                     unsafe_allow_html=True
                 )
             else:
                 st.markdown(
-                    f'<div class="chat-bot">🤖 <b>AI:</b> {msg["content"]}</div>',
+                    f'<div class="chat-bot"> <b>AI:</b> {msg["content"]}</div>',
                     unsafe_allow_html=True
                 )
 
@@ -1513,7 +1513,7 @@ def page_ai_chat() -> None:
             "Wiadomość", placeholder="Np: 'co sądzisz o NVDA?', 'jak działa RSI?', 'status systemu'",
             label_visibility="collapsed"
         )
-        send = c2.form_submit_button("📨 Wyślij", use_container_width=True)
+        send = c2.form_submit_button(" Wyślij", use_container_width=True)
 
     if send and user_input.strip():
         st.session_state.chat_history.append({"role": "user", "content": user_input})
@@ -1524,12 +1524,12 @@ def page_ai_chat() -> None:
 
     # Przycisk czyszczenia historii
     if st.session_state.chat_history:
-        if st.button("🗑️ Wyczyść historię czatu"):
+        if st.button(" Wyczyść historię czatu"):
             st.session_state.chat_history = []
             st.rerun()
 
     # Podpowiedzi szybkich komend
-    st.markdown("### 💡 Szybkie pytania")
+    st.markdown("###  Szybkie pytania")
     quick_cmds = [
         "Co sądzisz o NVDA teraz?", "Jak działa RSI?", "Co to jest short selling?",
         "Jaki jest status systemu?", "Wyjaśnij strategię mean reversion", "Co to jest VIX?",
@@ -1537,7 +1537,7 @@ def page_ai_chat() -> None:
     ]
     cols = st.columns(3)
     for i, cmd in enumerate(quick_cmds):
-        if cols[i % 3].button(f"▶ {cmd}", key=f"quick_{i}"):
+        if cols[i % 3].button(f" {cmd}", key=f"quick_{i}"):
             st.session_state.chat_history.append({"role": "user", "content": cmd})
             with st.spinner("…"):
                 response = _groq_direct(cmd, [])
@@ -1546,7 +1546,7 @@ def page_ai_chat() -> None:
 
 
 def page_logs() -> None:
-    st.title("📜 Logi systemowe")
+    st.title("Logi systemowe")
     lines = st.slider("Liczba linii", 20, 500, 100, 10)
     logs  = _get(f"/logs?lines={lines}")
 
@@ -1557,12 +1557,12 @@ def page_logs() -> None:
     log_text = "\n".join(logs) if isinstance(logs, list) else str(logs)
     st.code(log_text, language="")
 
-    if st.button("🔄 Odśwież"):
+    if st.button(" Odśwież"):
         st.rerun()
 
 
 def page_backtester() -> None:
-    st.title("🔬 Backtester")
+    st.title("Backtester")
     st.caption("Testuj strategie na danych historycznych (yfinance)")
 
     c1, c2, c3 = st.columns(3)
@@ -1582,7 +1582,7 @@ def page_backtester() -> None:
     run_wfa = col_wf.checkbox("Walk-Forward Analysis", value=False)
     run_mc  = col_mc.checkbox("Monte Carlo (1000 sim)", value=False)
 
-    if st.button("▶ Uruchom Backtest", type="primary", use_container_width=True):
+    if st.button(" Uruchom Backtest", type="primary", use_container_width=True):
         with st.spinner(f"Ładuję dane {symbol} i uruchamiam backtest…"):
             result = _post("/backtest/run", {
                 "symbol":    symbol,
@@ -1596,13 +1596,13 @@ def page_backtester() -> None:
             })
 
         if not result or result.get("error"):
-            st.error(f"❌ {result.get('error', 'Błąd backtestów') if result else 'Brak odpowiedzi API'}")
-            st.info("💡 Upewnij się że system działa i `yfinance` jest zainstalowany")
+            st.error(f" {result.get('error', 'Błąd backtestów') if result else 'Brak odpowiedzi API'}")
+            st.info(" Upewnij się że system działa i `yfinance` jest zainstalowany")
             return
 
         bt = result.get("backtest", {})
 
-        st.success(f"✅ Backtest zakończony – {bt.get('total_trades', 0)} transakcji")
+        st.success(f" Backtest zakończony – {bt.get('total_trades', 0)} transakcji")
 
         # Metryki
         m1, m2, m3, m4, m5 = st.columns(5)
@@ -1662,17 +1662,17 @@ def page_backtester() -> None:
 
 
 def page_fundamentals() -> None:
-    st.title("📊 Analiza Fundamentalna")
+    st.title(" Analiza Fundamentalna")
     st.markdown("P/E, Forward P/E, PEG, ROE i inne wskaźniki dla każdego symbolu.")
     st.markdown("---")
 
     # Wybór symbolu
     col1, col2 = st.columns([2, 1])
     with col1:
-        symbol = st.text_input("🔍 Symbol", value="AAPL", placeholder="np. AAPL, TSLA, NVDA").upper().strip()
+        symbol = st.text_input(" Symbol", value="AAPL", placeholder="np. AAPL, TSLA, NVDA").upper().strip()
     with col2:
         st.markdown("<br>", unsafe_allow_html=True)
-        fetch = st.button("📡 Pobierz dane", use_container_width=True, type="primary")
+        fetch = st.button(" Pobierz dane", use_container_width=True, type="primary")
 
     # Szybkie przyciski
     quick = ["AAPL", "MSFT", "NVDA", "TSLA", "GOOGL", "AMZN", "META", "AMD"]
@@ -1705,10 +1705,10 @@ def page_fundamentals() -> None:
         st.error(f"Brak danych dla {symbol}. Sprawdź czy symbol jest poprawny.")
         return
 
-    # ── Header firmy ─────────────────────────────────────────────────────────
+    #  Header firmy 
     overall    = data.get("overall", "neutral")
     ov_color   = "#34d399" if overall == "bullish" else "#f87171" if overall == "bearish" else "#fbbf24"
-    ov_text    = "📈 BULLISH" if overall == "bullish" else "📉 BEARISH" if overall == "bearish" else "➡️ NEUTRALNY"
+    ov_text    = " BULLISH" if overall == "bullish" else " BEARISH" if overall == "bearish" else " NEUTRALNY"
 
     st.markdown(
         f'<div style="background:#111827;border:1px solid #1e3a5f;border-radius:12px;padding:20px;margin-bottom:16px;">'
@@ -1724,8 +1724,8 @@ def page_fundamentals() -> None:
         unsafe_allow_html=True,
     )
 
-    # ── Wskaźniki wyceny ─────────────────────────────────────────────────────
-    st.subheader("💰 Wskaźniki wyceny")
+    #  Wskaźniki wyceny 
+    st.subheader(" Wskaźniki wyceny")
     c1, c2, c3, c4, c5 = st.columns(5)
 
     def _metric_card(col, label, value, interpretation, good_if_low=True):
@@ -1742,7 +1742,7 @@ def page_fundamentals() -> None:
     _metric_card(c5, "EV/EBITDA",     data.get("ev_ebitda"),   "wartość przedsiębiorstwa")
 
     st.markdown("---")
-    st.subheader("📈 Finanse")
+    st.subheader(" Finanse")
     f1, f2, f3, f4, f5 = st.columns(5)
     f1.metric("EPS (TTM)",     f"${data.get('eps', 'N/A')}")
     f2.metric("Forward EPS",   f"${data.get('forward_eps', 'N/A')}")
@@ -1756,8 +1756,8 @@ def page_fundamentals() -> None:
 
     st.markdown("---")
 
-    # ── Poradnik interpretacji ────────────────────────────────────────────────
-    with st.expander("📚 Jak interpretować wskaźniki?"):
+    #  Poradnik interpretacji 
+    with st.expander(" Jak interpretować wskaźniki?"):
         st.markdown("""
 **P/E Ratio** (Cena / Zysk na akcję)
 - Mówi ile płacisz za każdy $1 zysku firmy
@@ -1770,9 +1770,9 @@ def page_fundamentals() -> None:
 
 **PEG Ratio** (P/E / Stopa wzrostu EPS)
 - Uwzględnia wzrost firmy — lepsza miara niż samo P/E
-- PEG < 1 → akcja tania względem wzrostu 🟢
-- PEG 1-2 → uczciwa wycena 🟡
-- PEG > 2 → droga względem wzrostu 🔴
+- PEG < 1 → akcja tania względem wzrostu [●]
+- PEG 1-2 → uczciwa wycena [●]
+- PEG > 2 → droga względem wzrostu 
 
 **ROE** (Zwrot z kapitału własnego)
 - Mierzy jak efektywnie firma wykorzystuje kapitał
@@ -1788,7 +1788,7 @@ def page_fundamentals() -> None:
 
 def page_coach() -> None:
     _page_autorefresh("coach", "30s")
-    st.title("🏆 Szef / Ranking Agentów")
+    st.title("Szef / Ranking Agentów")
     st.markdown("Coach ocenia każdy trade i sesję — przyznaje punkty i awansuje agentów.")
     st.markdown("---")
 
@@ -1798,7 +1798,7 @@ def page_coach() -> None:
         st.info("Brak danych. Uruchom Sesję Testową żeby Coach zaczął oceniać agentów.")
         return
 
-    # ── Overall Stats ─────────────────────────────────────────────────────────
+    #  Overall Stats 
     total_pnl    = sum(r["total_pnl"]   for r in ranking)
     total_trades = sum(r["total_trades"] for r in ranking)
 
@@ -1817,7 +1817,7 @@ def page_coach() -> None:
     st.markdown(
         f'<div style="background:linear-gradient(135deg,#0f172a,#1e3a5f);'
         f'border:1px solid #1e3a5f;border-radius:14px;padding:20px;margin-bottom:16px;">'
-        f'<div style="color:#93c5fd;font-size:13px;font-weight:600;margin-bottom:12px;">📊 OVERALL — WSZYSCY AGENCI</div>'
+        f'<div style="color:#93c5fd;font-size:13px;font-weight:600;margin-bottom:12px;"> OVERALL — WSZYSCY AGENCI</div>'
         f'<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;">'
         f'<div style="text-align:center;">'
         f'<div style="color:#64748b;font-size:11px;">ŁĄCZNY PnL</div>'
@@ -1847,12 +1847,12 @@ def page_coach() -> None:
 
     st.markdown("---")
 
-    # ── Podium Top 3 ─────────────────────────────────────────────────────────
-    st.subheader("🥇 Podium")
+    #  Podium Top 3 
+    st.subheader(" Podium")
     podium_cols = st.columns(3)
     podium_order = [1, 0, 2]  # srebro, złoto, brąz
     podium_colors = ["#94a3b8", "#fbbf24", "#cd7f32"]
-    podium_labels = ["🥈 2. miejsce", "🥇 1. miejsce", "🥉 3. miejsce"]
+    podium_labels = [" 2. miejsce", " 1. miejsce", " 3. miejsce"]
 
     for col_idx, rank_idx in enumerate(podium_order):
         if rank_idx < len(ranking):
@@ -1874,13 +1874,13 @@ def page_coach() -> None:
 
     st.markdown("---")
 
-    # ── Pełny ranking ─────────────────────────────────────────────────────────
-    st.subheader("📊 Pełny ranking")
+    #  Pełny ranking 
+    st.subheader(" Pełny ranking")
 
     for r in ranking:
         pnl_color  = "#34d399" if r["total_pnl"] >= 0 else "#f87171"
         streak     = r.get("current_streak", 0)
-        streak_str = f"🔥 {streak}" if streak > 0 else f"❄️ {abs(streak)}" if streak < 0 else "—"
+        streak_str = f" {streak}" if streak > 0 else f" {abs(streak)}" if streak < 0 else "—"
         next_lvl   = ""
 
         with st.expander(
@@ -1890,35 +1890,35 @@ def page_coach() -> None:
             expanded=(r["rank"] == 1),
         ):
             c1, c2, c3, c4, c5 = st.columns(5)
-            c1.metric("🏆 Punkty",     r["total_points"])
-            c2.metric("📈 Win Rate",   f"{r['win_rate']:.0f}%")
-            c3.metric("💰 Total PnL",  f"${r['total_pnl']:+.2f}")
-            c4.metric("🔄 Seria",      streak_str)
-            c5.metric("📋 Tradów",     r["total_trades"])
+            c1.metric(" Punkty",     r["total_points"])
+            c2.metric(" Win Rate",   f"{r['win_rate']:.0f}%")
+            c3.metric(" Total PnL",  f"${r['total_pnl']:+.2f}")
+            c4.metric(" Seria",      streak_str)
+            c5.metric(" Tradów",     r["total_trades"])
 
             c6, c7 = st.columns(2)
-            c6.metric("✅ Najlepszy trade", f"${r['best_trade']:+.2f}")
-            c7.metric("❌ Najgorszy trade", f"${r['worst_trade']:+.2f}")
+            c6.metric(" Najlepszy trade", f"${r['best_trade']:+.2f}")
+            c7.metric(" Najgorszy trade", f"${r['worst_trade']:+.2f}")
 
             # Info o trudności zdobywania punktów
             level_mults = {
-                "🥚 Nowicjusz": (1.0, "Pełne punkty za każdy zysk"),
-                "🌱 Stażysta":  (0.9, "−10% nagród — rośniesz"),
-                "📊 Analityk":  (0.8, "−20% nagród — standard coraz wyższy"),
-                "💼 Trader":    (0.7, "−30% nagród — tylko dobre setupy się liczą"),
-                "⭐ Senior Trader": (0.6, "−40% nagród — wymagające środowisko"),
-                "🏆 Ekspert":   (0.5, "Połowa nagród — elita musi udowodnić każdy trade"),
-                "💎 Master":    (0.4, "−60% nagród — tylko mistrzowie przetrwają"),
-                "🚀 Legenda":   (0.3, "−70% nagród — każdy punkt to walka"),
+                " Nowicjusz": (1.0, "Pełne punkty za każdy zysk"),
+                " Stażysta":  (0.9, "−10% nagród — rośniesz"),
+                " Analityk":  (0.8, "−20% nagród — standard coraz wyższy"),
+                " Trader":    (0.7, "−30% nagród — tylko dobre setupy się liczą"),
+                " Senior Trader": (0.6, "−40% nagród — wymagające środowisko"),
+                " Ekspert":   (0.5, "Połowa nagród — elita musi udowodnić każdy trade"),
+                " Master":    (0.4, "−60% nagród — tylko mistrzowie przetrwają"),
+                " Legenda":   (0.3, "−70% nagród — każdy punkt to walka"),
             }
-            lv = r.get("level", "🥚 Nowicjusz")
+            lv = r.get("level", " Nowicjusz")
             mult, desc = level_mults.get(lv, (1.0, ""))
             bar_pct = int(mult * 100)
             bar_color = "#34d399" if mult > 0.6 else "#fbbf24" if mult > 0.4 else "#f87171"
             st.markdown(
                 f'<div style="background:#0f172a;border:1px solid #1e3a5f;border-radius:8px;'
                 f'padding:10px;margin:8px 0;">'
-                f'<div style="color:#64748b;font-size:11px;margin-bottom:6px;">⚙️ TRUDNOŚĆ ZDOBYWANIA PUNKTÓW</div>'
+                f'<div style="color:#64748b;font-size:11px;margin-bottom:6px;"> TRUDNOŚĆ ZDOBYWANIA PUNKTÓW</div>'
                 f'<div style="display:flex;align-items:center;gap:10px;">'
                 f'<div style="background:#1e3a5f;border-radius:4px;height:8px;flex:1;">'
                 f'<div style="background:{bar_color};height:8px;border-radius:4px;width:{bar_pct}%;"></div></div>'
@@ -1931,7 +1931,7 @@ def page_coach() -> None:
             # Ostatnie recenzje Szefa
             reviews = r.get("recent_reviews", [])
             if reviews:
-                st.markdown("**📝 Ostatnie oceny Szefa:**")
+                st.markdown("** Ostatnie oceny Szefa:**")
                 for rev in reviews[:5]:
                     pts    = rev.get("points", 0)
                     pts_color = "#34d399" if pts > 0 else "#f87171"
@@ -1949,7 +1949,7 @@ def page_coach() -> None:
 
             # Reset
         if not _is_viewer():
-            if st.button(f"🔄 Resetuj {r['agent_name']}", key=f"reset_{r['agent_name']}"):
+            if st.button(f" Resetuj {r['agent_name']}", key=f"reset_{r['agent_name']}"):
                 result = _post(f"/coach/reset/{r['agent_name']}", {})
                 if result and result.get("ok"):
                     st.success(f"Zresetowano wyniki {r['agent_name']}")
@@ -1957,12 +1957,12 @@ def page_coach() -> None:
 
     st.markdown("---")
 
-    # ── Legenda poziomów ──────────────────────────────────────────────────────
-    st.subheader("📚 Poziomy agentów")
+    #  Legenda poziomów 
+    st.subheader(" Poziomy agentów")
     levels = [
-        ("🥚 Nowicjusz", 0), ("🌱 Stażysta", 50), ("📊 Analityk", 150),
-        ("💼 Trader", 300), ("⭐ Senior Trader", 500),
-        ("🏆 Ekspert", 800), ("💎 Master", 1200), ("🚀 Legenda", 2000),
+        (" Nowicjusz", 0), (" Stażysta", 50), (" Analityk", 150),
+        (" Trader", 300), (" Senior Trader", 500),
+        (" Ekspert", 800), (" Master", 1200), (" Legenda", 2000),
     ]
     level_cols = st.columns(4)
     for i, (name, pts) in enumerate(levels):
@@ -1980,12 +1980,12 @@ def page_coach() -> None:
 
 def page_transactions() -> None:
     _page_autorefresh("transactions", "30s")
-    st.title("💱 Transakcje")
+    st.title("Transakcje")
 
     from streamlit_autorefresh import st_autorefresh
     st_autorefresh(interval=10000, key="tx_autorefresh")
 
-    # ── Filtry ────────────────────────────────────────────────────────────────
+    #  Filtry 
     col1, col2, col3 = st.columns(3)
     with col1:
         mode_filter = st.selectbox("Tryb", ["Wszystkie", "Paper", "Real"], index=0)
@@ -1994,7 +1994,7 @@ def page_transactions() -> None:
     with col3:
         limit = st.selectbox("Liczba rekordów", [25, 50, 100, 250], index=0)
 
-    # ── Pobierz zlecenia z API ────────────────────────────────────────────────
+    #  Pobierz zlecenia z API 
     orders = _get(f"/orders?limit={limit}") or []
 
     if mode_filter == "Paper":
@@ -2005,17 +2005,17 @@ def page_transactions() -> None:
     if status_filter != "Wszystkie":
         orders = [o for o in orders if o.get("status", "").lower() == status_filter.lower()]
 
-    # ── Metryki podsumowania ──────────────────────────────────────────────────
+    #  Metryki podsumowania 
     total   = len(orders)
     filled  = sum(1 for o in orders if o.get("status") == "filled")
     total_pnl = sum(float(o.get("avg_price", 0)) * float(o.get("filled_qty", 0)) *
                     (1 if o.get("side") == "BUY" else -1) for o in orders if o.get("filled_qty"))
 
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("📋 Łącznie zleceń", total)
-    c2.metric("✅ Wypełnionych", filled)
-    c3.metric("❌ Innych", total - filled)
-    c4.metric("🔄 Auto-refresh", "5s")
+    c1.metric(" Łącznie zleceń", total)
+    c2.metric(" Wypełnionych", filled)
+    c3.metric(" Innych", total - filled)
+    c4.metric(" Auto-refresh", "5s")
 
     st.markdown("---")
 
@@ -2023,8 +2023,8 @@ def page_transactions() -> None:
         st.info("Brak transakcji. Agenci zaczną handlować gdy giełda będzie otwarta (15:30 PL).")
         return
 
-    # ── Tabela transakcji ─────────────────────────────────────────────────────
-    st.subheader(f"📋 Historia zleceń ({total})")
+    #  Tabela transakcji 
+    st.subheader(f" Historia zleceń ({total})")
 
     for o in orders:
         side     = o.get("side", "")
@@ -2052,7 +2052,7 @@ def page_transactions() -> None:
             f'border-radius:0 8px 8px 0;padding:10px 16px;margin:3px 0;">'
             f'<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">'
             f'<span style="color:{border};font-weight:700;min-width:60px">'
-            f'{"▲ BUY" if is_buy else "▼ SELL"}</span>'
+            f'{" BUY" if is_buy else " SELL"}</span>'
             f'<span style="color:#93c5fd;font-weight:600;min-width:60px">{symbol}</span>'
             f'<span style="color:#e2e8f0;font-family:monospace">'
             f'{float(qty):.4f} szt. @ ${float(price):.2f}</span>'
@@ -2065,16 +2065,16 @@ def page_transactions() -> None:
         )
 
     st.markdown("---")
-    st.caption("💡 Dane odświeżane co 5 sekund automatycznie")
+    st.caption(" Dane odświeżane co 5 sekund automatycznie")
 
 
 def page_paper_session() -> None:
     _page_autorefresh("paper_session", "30s")
-    st.title("🧪 Sesja Testowa — Paper Trading")
+    st.title("Sesja Testowa — Paper Trading")
     st.markdown("Agenci handlują **na sucho** przez wybrany czas. Po zakończeniu widzisz pełny raport.")
     st.markdown("---")
 
-    # ── Inicjalizacja session state ───────────────────────────────────────────
+    #  Inicjalizacja session state 
     if "ps_session_id"  not in st.session_state: st.session_state.ps_session_id  = None
     if "ps_status"      not in st.session_state: st.session_state.ps_status      = "idle"
     if "ps_report"      not in st.session_state: st.session_state.ps_report      = None
@@ -2082,7 +2082,7 @@ def page_paper_session() -> None:
     if "ps_start_time"  not in st.session_state: st.session_state.ps_start_time  = None
     if "ps_duration"    not in st.session_state: st.session_state.ps_duration    = 5
 
-    # ── Auto-wznowienie aktywnej sesji po powrocie na stronę ──────────────────
+    #  Auto-wznowienie aktywnej sesji po powrocie na stronę 
     if st.session_state.ps_status == "idle" or st.session_state.ps_session_id is None:
         active_sessions = _get("/paper-sessions") or []
         running = [s for s in active_sessions if s.get("status") == "running"]
@@ -2098,14 +2098,14 @@ def page_paper_session() -> None:
             # Oszacuj czas trwania z liczby tradów
             st.session_state.ps_duration    = last.get("duration_min", 5)
 
-    # ── Konfiguracja ─────────────────────────────────────────────────────────
+    #  Konfiguracja 
     if st.session_state.ps_status == "idle":
-        st.subheader("⚙️ Konfiguracja sesji")
+        st.subheader(" Konfiguracja sesji")
         col1, col2 = st.columns(2)
         with col1:
-            duration = st.slider("⏱️ Czas trwania (minuty)", 1, 360, 5)
-            st.caption(f"➡️ {duration} min = {duration//60}h {duration%60}min")
-            capital  = st.number_input("💰 Kapitał startowy ($)", 1000, 100000, 10000, step=1000)
+            duration = st.slider("⏱ Czas trwania (minuty)", 1, 360, 5)
+            st.caption(f" {duration} min = {duration//60}h {duration%60}min")
+            capital  = st.number_input(" Kapitał startowy ($)", 1000, 100000, 10000, step=1000)
         with col2:
             # Pobierz listę agentów z _AGENT_PROFILES
             try:
@@ -2120,7 +2120,7 @@ def page_paper_session() -> None:
                                    "DivergenceHunter","ScalpKing","WhaleTracker"]
 
             agents = st.multiselect(
-                "🤖 Agenci biorący udział",
+                "Agenci biorący udział",
                 all_agent_names,
                 default=all_agent_names,
             )
@@ -2129,11 +2129,11 @@ def page_paper_session() -> None:
             _sys.path.insert(0, ".")
             from core.symbols import SYMBOL_NAMES, CATEGORY_LABELS
 
-            # ── Wyszukiwarka symboli ──────────────────────────────────────────
-            st.markdown("**📈 Wybierz symbole**")
+            #  Wyszukiwarka symboli 
+            st.markdown("** Wybierz symbole**")
 
             # Pasek wyszukiwania
-            sym_search = st.text_input("🔍 Szukaj symbolu", placeholder="np. Bitcoin, BTC, ARLN, SPY...",
+            sym_search = st.text_input(" Szukaj symbolu", placeholder="np. Bitcoin, BTC, ARLN, SPY...",
                                         key="ps_sym_search", label_visibility="collapsed")
 
             # Filtr kategorii
@@ -2158,20 +2158,20 @@ def page_paper_session() -> None:
 
             # Szybkie przyciski
             quick_sets = {
-                "🇺🇸 Top US":   ["AAPL","MSFT","NVDA","TSLA","META","GOOGL","AMZN","SPY","QQQ"],
-                "₿ Krypto":    ["BTC","ETH","SOL","BNB","DOGE","AVAX","XRP","ADA"],
-                "🇵🇱 GPW":      ["ARLN","PKN","PKO","PZU","CDR","LPP","KGH"],
-                "📊 ETF":       ["SPY","QQQ","IWM","TQQQ","SQQQ","GLD","IBIT"],
+                " Top US":   ["AAPL","MSFT","NVDA","TSLA","META","GOOGL","AMZN","SPY","QQQ"],
+                "Krypto":    ["BTC","ETH","SOL","BNB","DOGE","AVAX","XRP","ADA"],
+                " GPW":      ["ARLN","PKN","PKO","PZU","CDR","LPP","KGH"],
+                " ETF":       ["SPY","QQQ","IWM","TQQQ","SQQQ","GLD","IBIT"],
             }
             qcols = st.columns(6)
             for i, (label, syms) in enumerate(quick_sets.items()):
                 if qcols[i].button(label, key=f"qs_{i}", use_container_width=True):
                     st.session_state["ps_selected_syms"] = syms
                     st.rerun()
-            if qcols[4].button("✅ Wszystkie", key="qs_all", use_container_width=True):
+            if qcols[4].button(" Wszystkie", key="qs_all", use_container_width=True):
                 st.session_state["ps_selected_syms"] = all_symbols_raw
                 st.rerun()
-            if qcols[5].button("❌ Wyczyść", key="qs_clear", use_container_width=True):
+            if qcols[5].button(" Wyczyść", key="qs_clear", use_container_width=True):
                 st.session_state["ps_selected_syms"] = []
                 st.rerun()
 
@@ -2194,7 +2194,7 @@ def page_paper_session() -> None:
                 st.session_state["ps_selected_syms"] = symbols
             st.caption(f"Wybrano: {len(symbols)} symboli")
 
-        if st.button("▶️ Rozpocznij Sesję Testową", type="primary", use_container_width=True):
+        if st.button(" Rozpocznij Sesję Testową", type="primary", use_container_width=True):
             if not agents:
                 st.error("Wybierz co najmniej jednego agenta!")
             else:
@@ -2214,16 +2214,16 @@ def page_paper_session() -> None:
                     st.session_state.ps_duration    = duration
                     st.rerun()
                 else:
-                    st.error(f"❌ Błąd startu sesji: {r}")
+                    st.error(f" Błąd startu sesji: {r}")
 
-    # ── Sesja w toku ──────────────────────────────────────────────────────────
+    #  Sesja w toku 
     elif st.session_state.ps_status == "running":
         import datetime as _dt
 
         sid      = st.session_state.ps_session_id
         duration = st.session_state.ps_duration
 
-        # ── Pobierz dane z API ────────────────────────────────────────────────
+        #  Pobierz dane z API 
         data = _get(f"/paper-session/{sid}/status")
         if data:
             if data.get("status") == "done":
@@ -2241,7 +2241,7 @@ def page_paper_session() -> None:
         now      = _dt.datetime.now()
         now_str  = now.strftime("%H:%M:%S")
 
-        # ── Oblicz pozostały czas ─────────────────────────────────────────────
+        #  Oblicz pozostały czas 
         start_str  = st.session_state.ps_start_time
         try:
             start_time    = _dt.datetime.fromisoformat(start_str) if start_str else now
@@ -2258,25 +2258,25 @@ def page_paper_session() -> None:
             time_str     = "—"
             progress_pct = 0.0
 
-        # ── Oblicz PnL z zamkniętych transakcji ───────────────────────────────
+        #  Oblicz PnL z zamkniętych transakcji 
         closed    = [t for t in trades if t.get("status") in ("CLOSED","EXPIRED") and t.get("pnl_usd") is not None]
         total_pnl = sum(t["pnl_usd"] for t in closed)
         pnl_color = "#34d399" if total_pnl >= 0 else "#f87171"
         pnl_sign  = "+" if total_pnl >= 0 else ""
 
-        # ── Top 3 boty ────────────────────────────────────────────────────────
+        #  Top 3 boty 
         agent_pnl: dict[str, float] = {}
         for t in closed:
             a = t.get("agent","?")
             agent_pnl[a] = agent_pnl.get(a, 0) + t["pnl_usd"]
         top3 = sorted(agent_pnl.items(), key=lambda x: x[1], reverse=True)[:3]
 
-        # ── Render header ─────────────────────────────────────────────────────
+        #  Render header 
         st.markdown(
             f'<div style="background:#0d1321;border:1px solid #1e3a5f;border-radius:12px;'
             f'padding:20px;margin-bottom:16px;">'
             f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">'
-            f'<span style="color:#93c5fd;font-weight:700;font-size:16px;">⚡ Sesja aktywna</span>'
+            f'<span style="color:#93c5fd;font-weight:700;font-size:16px;"> Sesja aktywna</span>'
             f'<span style="color:#334155;font-size:12px;font-family:monospace;">{sid}</span>'
             f'</div>'
             f'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px;">'
@@ -2304,7 +2304,7 @@ def page_paper_session() -> None:
             f'</div>'
             + (
                 f'<div style="border-top:1px solid #1e3a5f;padding-top:12px;">'
-                f'<div style="color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🏆 Top agenci</div>'
+                f'<div style="color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"> Top agenci</div>'
                 f'<div style="display:flex;gap:8px;">'
                 + "".join([
                     f'<div style="background:#111827;border:1px solid {"#16a34a" if p>=0 else "#dc2626"};'
@@ -2322,13 +2322,13 @@ def page_paper_session() -> None:
             unsafe_allow_html=True,
         )
 
-        # ── Przyciski kontrolne ───────────────────────────────────────────────
+        #  Przyciski kontrolne 
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("🔄 Odśwież", use_container_width=True):
+            if st.button(" Odśwież", use_container_width=True):
                 st.rerun()
         with col2:
-            if st.button("⏹️ Zakończ i pokaż raport", use_container_width=True, type="primary"):
+            if st.button("⏹ Zakończ i pokaż raport", use_container_width=True, type="primary"):
                 data = _get(f"/paper-session/{sid}/status")
                 if data:
                     st.session_state.ps_status      = "done"
@@ -2338,8 +2338,8 @@ def page_paper_session() -> None:
 
         st.markdown("---")
 
-        # ── Live feed — aktualizuje się bez odświeżania strony ────────────────
-        st.subheader(f"📊 Ostatnie działania agentów")
+        #  Live feed — aktualizuje się bez odświeżania strony 
+        st.subheader(f" Ostatnie działania agentów")
         trade_container = st.container()
         with trade_container:
             if trades:
@@ -2354,7 +2354,7 @@ def page_paper_session() -> None:
                     st.markdown(
                         f'<div style="background:#0d1321;border-left:3px solid {border};'
                         f'border-radius:0 6px 6px 0;padding:8px 12px;margin:2px 0;">'
-                        f'<span style="color:{border};font-weight:700;min-width:55px;display:inline-block">{"▲ LONG" if is_long else "▼ SHORT"}</span>'
+                        f'<span style="color:{border};font-weight:700;min-width:55px;display:inline-block">{" LONG" if is_long else " SHORT"}</span>'
                         f'<span style="color:#93c5fd;font-weight:600;margin:0 8px">{t["symbol"]}</span>'
                         f'<span style="color:#64748b;font-size:12px">{t["agent"]}</span>'
                         f'<span style="color:#475569;margin:0 6px">·</span>'
@@ -2369,22 +2369,22 @@ def page_paper_session() -> None:
             else:
                 st.markdown('<div style="text-align:center;color:#475569;padding:30px;">⏳ Czekam na pierwsze sygnały...</div>', unsafe_allow_html=True)
 
-        st.caption("💡 Kliknij '🔄 Odśwież' aby zaktualizować dane")
+        st.caption(" Kliknij ' Odśwież' aby zaktualizować dane")
 
-    # ── Raport końcowy ────────────────────────────────────────────────────────
+    #  Raport końcowy 
     elif st.session_state.ps_status == "done":
         report = st.session_state.ps_report
         if not report:
             st.warning("Raport jeszcze się generuje... Odśwież za chwilę.")
-            if st.button("🔄 Odśwież"):
+            if st.button(" Odśwież"):
                 st.rerun()
             return
 
-        st.success(f"✅ Sesja zakończona! Czas trwania: **{report.get('duration_min', 0):.1f} min**")
+        st.success(f" Sesja zakończona! Czas trwania: **{report.get('duration_min', 0):.1f} min**")
         st.markdown("---")
 
-        # ── Metryki główne ────────────────────────────────────────────────────
-        st.subheader("📊 Podsumowanie")
+        #  Metryki główne 
+        st.subheader(" Podsumowanie")
         c1, c2, c3, c4, c5 = st.columns(5)
         pnl      = report.get("total_pnl_usd", 0)
         pnl_pct  = report.get("total_pnl_pct", 0)
@@ -2399,11 +2399,11 @@ def page_paper_session() -> None:
         c6.metric("Najlepsza transakcja", f"${report.get('best_trade_pnl', 0):+.2f}")
         c7.metric("Najgorsza transakcja", f"${report.get('worst_trade_pnl', 0):+.2f}")
 
-        # ── Stats per agent ───────────────────────────────────────────────────
+        #  Stats per agent 
         agent_stats = report.get("agent_stats", {})
         if agent_stats:
             st.markdown("---")
-            st.subheader("🤖 Wyniki per Agent")
+            st.subheader(" Wyniki per Agent")
             cols = st.columns(len(agent_stats))
             for i, (agent, stats) in enumerate(agent_stats.items()):
                 with cols[i]:
@@ -2411,9 +2411,9 @@ def page_paper_session() -> None:
                     st.metric(agent, f"${pnl_a:+.2f}", f"WR: {stats.get('win_rate', 0):.0f}%")
                     st.caption(f"Tradów: {stats.get('trades', 0)} | W: {stats.get('wins', 0)} / L: {stats.get('losses', 0)}")
 
-        # ── Szczegółowe transakcje ────────────────────────────────────────────
+        #  Szczegółowe transakcje 
         st.markdown("---")
-        st.subheader("📋 Szczegóły transakcji")
+        st.subheader(" Szczegóły transakcji")
 
         trades = report.get("trades", [])
         closed = [t for t in trades if t.get("status") in ("CLOSED", "EXPIRED")]
@@ -2426,8 +2426,8 @@ def page_paper_session() -> None:
                 pnl_t  = t.get("actual_pnl_usd") or 0
                 pred   = t.get("predicted_gain_pct") or 0
                 actual = t.get("actual_pnl_pct") or 0
-                icon   = "🟢" if pnl_t > 0 else "🔴"
-                dir_icon = "⬆️" if t["direction"] == "LONG" else "⬇️"
+                icon   = "[●]" if pnl_t > 0 else ""
+                dir_icon = "" if t["direction"] == "LONG" else ""
 
                 with st.expander(
                     f"{icon} {dir_icon} **{t['agent']}** | {t['symbol']} | "
@@ -2444,21 +2444,21 @@ def page_paper_session() -> None:
                     col_e.metric("Rzeczywisty zysk",  f"{actual:+.2f}%",
                                  delta=f"{actual - pred:+.2f}% vs prognoza")
 
-                    st.markdown(f"**💬 Reasoning agenta:**")
+                    st.markdown(f"** Reasoning agenta:**")
                     st.info(t.get("reasoning", "—"))
                     st.caption(f"Pewność sygnału: {t.get('confidence', 0):.0%} | Status: {t.get('status')}")
         else:
             st.info("Brak zamkniętych transakcji w tej sesji.")
 
         st.markdown("---")
-        if st.button("🔁 Nowa sesja", type="primary", use_container_width=True):
+        if st.button(" Nowa sesja", type="primary", use_container_width=True):
             st.session_state.ps_status      = "idle"
             st.session_state.ps_session_id  = None
             st.session_state.ps_report      = None
             st.session_state.ps_live_trades = []
             st.rerun()
 
-        # ── Sekcja uczenia ────────────────────────────────────────────────────
+        #  Sekcja uczenia 
         sid = st.session_state.ps_session_id
         if sid:
             data = _get(f"/paper-session/{sid}/status")
@@ -2466,7 +2466,7 @@ def page_paper_session() -> None:
 
             if lessons:
                 st.markdown("---")
-                st.subheader("🎓 Czego nauczyli się agenci?")
+                st.subheader(" Czego nauczyli się agenci?")
                 st.markdown("Po tej sesji każdy agent przeanalizował swoje błędy i dostosował parametry.")
 
                 for lesson in lessons:
@@ -2477,34 +2477,34 @@ def page_paper_session() -> None:
                     summary = lesson.get("summary", "")
                     params  = lesson.get("new_params", {})
 
-                    icon = "✅" if pnl > 0 else "❌"
+                    icon = "" if pnl > 0 else ""
                     with st.expander(
                         f"{icon} **{agent}** — WR: {wr:.0f}% | PnL: ${pnl:+.2f} | "
                         f"Zmian parametrów: {len(changes)}",
                         expanded=(len(changes) > 0),
                     ):
                         # Podsumowanie słowne
-                        st.markdown("**📝 Co agent mówi o sobie:**")
+                        st.markdown("** Co agent mówi o sobie:**")
                         st.info(summary)
 
                         # Zmiany parametrów
                         if changes:
-                            st.markdown("**⚙️ Zmiany parametrów:**")
+                            st.markdown("** Zmiany parametrów:**")
                             for c in changes:
                                 delta = float(c.get("new", 0)) - float(c.get("old", 0))
-                                arrow = "⬆️" if delta > 0 else "⬇️"
+                                arrow = "" if delta > 0 else ""
                                 st.markdown(
                                     f"{arrow} **{c['param']}**: "
                                     f"`{c['old']}` → `{c['new']}`  \n"
                                     f"_{c['reason']}_  \n"
-                                    f"💡 Efekt: {c['effect']}"
+                                    f" Efekt: {c['effect']}"
                                 )
                         else:
                             st.markdown("_Brak zmian — agent uznał wyniki za akceptowalne._")
 
                         # Aktualne parametry
                         if params:
-                            st.markdown("**📊 Aktualne parametry agenta:**")
+                            st.markdown("** Aktualne parametry agenta:**")
                             pc1, pc2, pc3, pc4 = st.columns(4)
                             pc1.metric("Min. pewność",    f"{params.get('confidence_threshold', 0.5):.0%}")
                             pc2.metric("Wielk. pozycji",  f"{params.get('position_size_mult', 1.0):.2f}x")
@@ -2513,9 +2513,9 @@ def page_paper_session() -> None:
 
                 # Przycisk do podglądu całej historii uczenia
                 st.markdown("---")
-                st.markdown("💾 Parametry zostały zapisane — będą użyte w **następnej sesji testowej**.")
+                st.markdown(" Parametry zostały zapisane — będą użyte w **następnej sesji testowej**.")
 
-                if st.button("📚 Pokaż historię uczenia wszystkich agentów"):
+                if st.button(" Pokaż historię uczenia wszystkich agentów"):
                     mem_data = _get("/paper-session/memories") or {}
                     if mem_data:
                         for ag_name, mem in mem_data.items():
@@ -2526,15 +2526,15 @@ def page_paper_session() -> None:
 
 def page_markets() -> None:
     _page_autorefresh("markets", "30s")
-    st.title("🌍 Rynki — GPW & LSE")
+    st.title("Rynki — GPW & LSE")
 
     import plotly.graph_objects as go
     import requests as _req
     import datetime as _dt
     import time
 
-    # ── Wybór rynku ───────────────────────────────────────────────────────────
-    market = st.radio("Rynek", ["🇵🇱 GPW — Polska", "🇬🇧 LSE — Wielka Brytania"],
+    #  Wybór rynku 
+    market = st.radio("Rynek", [" GPW — Polska", " LSE — Wielka Brytania"],
                       horizontal=True, label_visibility="collapsed")
     is_gpw = "GPW" in market
 
@@ -2558,13 +2558,13 @@ def page_markets() -> None:
     }
     syms = GPW_SYMS if is_gpw else LSE_SYMS
     currency = "PLN" if is_gpw else "GBX"
-    flag = "🇵🇱" if is_gpw else "🇬🇧"
+    flag = "" if is_gpw else ""
 
     st.markdown(f"### {flag} {'Warszawa (GPW)' if is_gpw else 'Londyn (LSE)'} — dane przez Polygon.io")
     st.caption(f"Waluta: {currency} | Dane z opóźnieniem ~15 min (plan darmowy)")
 
-    # ── Tabela kursów ─────────────────────────────────────────────────────────
-    st.subheader("📋 Kursy")
+    #  Tabela kursów 
+    st.subheader(" Kursy")
 
     def _get_price(symbol: str) -> dict:
         cache_key = f"mkt_{symbol}"
@@ -2615,7 +2615,7 @@ def page_markets() -> None:
         chg    = price_data.get("chg", 0)
         high   = price_data.get("high", 0)
         low    = price_data.get("low", 0)
-        chg_color = "🟢" if chg >= 0 else "🔴"
+        chg_color = "[●]" if chg >= 0 else ""
         price_str = f"{close:,.2f}" if close else "—"
         chg_str   = f"{chg:+.2f}%" if close else "—"
 
@@ -2629,8 +2629,8 @@ def page_markets() -> None:
 
     st.markdown("---")
 
-    # ── Wykres świecowy ───────────────────────────────────────────────────────
-    st.subheader("📊 Wykres")
+    #  Wykres świecowy 
+    st.subheader(" Wykres")
     sym_options = [f"{t} — {n}" for t, n in syms.items()]
     selected = st.selectbox("Wybierz spółkę", sym_options, label_visibility="collapsed")
     symbol   = selected.split(" — ")[0]
@@ -2700,7 +2700,7 @@ def page_markets() -> None:
     last  = candles["c"][-1] if candles["c"] else 0
     prev  = candles["c"][-2] if len(candles["c"]) > 1 else last
     chg_v = ((last - prev) / (prev + 1e-9)) * 100
-    chg_c = "🟢" if chg_v >= 0 else "🔴"
+    chg_c = "[●]" if chg_v >= 0 else ""
     st.markdown(f"**{syms.get(symbol, symbol)}** &nbsp; `{symbol}` &nbsp; "
                 f"**{last:,.2f} {currency}** &nbsp; {chg_c} {chg_v:+.2f}%")
 
@@ -2747,14 +2747,14 @@ def page_crypto() -> None:
     sys.path.insert(0, ".")
     from core.symbols import SYMBOL_NAMES, get_full_name, CATEGORY_LABELS
 
-    # ── Wyszukiwarka ──────────────────────────────────────────────────────────
+    #  Wyszukiwarka 
     col_search, col_cat = st.columns([3, 1])
     with col_search:
-        query = st.text_input("🔍 Szukaj krypto", placeholder="np. Bitcoin, BTC, Ethereum...", label_visibility="collapsed")
+        query = st.text_input(" Szukaj krypto", placeholder="np. Bitcoin, BTC, Ethereum...", label_visibility="collapsed")
     with col_cat:
-        cat_filter = st.selectbox("Kategoria", ["Wszystkie", "₿ Krypto", "₿ Krypto ETF"], label_visibility="collapsed")
+        cat_filter = st.selectbox("Kategoria", ["Wszystkie", "Krypto", "Krypto ETF"], label_visibility="collapsed")
 
-    cat_map = {"₿ Krypto": "crypto", "₿ Krypto ETF": "crypto_etf"}
+    cat_map = {"Krypto": "crypto", "Krypto ETF": "crypto_etf"}
     cat = cat_map.get(cat_filter)
 
     # Filtruj symbole
@@ -2766,7 +2766,7 @@ def page_crypto() -> None:
     if cat:
         crypto_syms = {k: v for k, v in crypto_syms.items() if v[1] == cat}
 
-    # ── Wybór symbolu ─────────────────────────────────────────────────────────
+    #  Wybór symbolu 
     if not crypto_syms:
         st.info("Brak wyników dla podanego zapytania.")
         return
@@ -2780,14 +2780,14 @@ def page_crypto() -> None:
     symbol = selected_display.split(" — ")[0]
     full_name = get_full_name(symbol)
 
-    # ── Timeframe ─────────────────────────────────────────────────────────────
+    #  Timeframe 
     tf_options = ["1m", "5m", "15m", "1h", "4h", "1d"]
     tf = st.select_slider("Timeframe", options=tf_options, value="1h", label_visibility="collapsed")
     tf_map = {"1m":(1,"minute",2),"5m":(5,"minute",10),"15m":(15,"minute",20),
               "1h":(1,"hour",30),"4h":(4,"hour",60),"1d":(1,"day",365)}
     mult, span, days = tf_map[tf]
 
-    # ── Pobierz cenę live ─────────────────────────────────────────────────────
+    #  Pobierz cenę live 
     live_price = None
     # Próbuj przez API backendu (Alpaca Crypto)
     if _api_online():
@@ -2808,7 +2808,7 @@ def page_crypto() -> None:
         except Exception:
             pass
 
-    # ── Pobierz świece ────────────────────────────────────────────────────────
+    #  Pobierz świece 
     candles = None
     cache_key = f"crypto_{symbol}_{tf}"
     now = time.time()
@@ -2877,7 +2877,7 @@ def page_crypto() -> None:
         candles = {"t": dates.tolist(), "o":o, "h":h, "l":l, "c":c, "v":v}
         live_price = candles["c"][-1]
 
-    # ── Metryki ───────────────────────────────────────────────────────────────
+    #  Metryki 
     last_c = candles["c"][-1]  if candles["c"] else 0
     prev_c = candles["c"][-2]  if len(candles["c"]) > 1 else last_c
     high   = max(candles["h"]) if candles["h"] else 0
@@ -2895,12 +2895,12 @@ def page_crypto() -> None:
 
     st.markdown(f"## {full_name} `({symbol})`")
     m1, m2, m3, m4 = st.columns(4)
-    m1.metric("💰 Cena",       price_str,      f"{chg:+.2f}%")
-    m2.metric("📈 Max (okres)", f"${high:,.4f}" if high < 1000 else f"${high:,.2f}")
-    m3.metric("📉 Min (okres)", f"${low:,.4f}"  if low  < 1000 else f"${low:,.2f}")
-    m4.metric("📊 Świec",       str(len(candles["c"])))
+    m1.metric(" Cena",       price_str,      f"{chg:+.2f}%")
+    m2.metric(" Max (okres)", f"${high:,.4f}" if high < 1000 else f"${high:,.2f}")
+    m3.metric(" Min (okres)", f"${low:,.4f}"  if low  < 1000 else f"${low:,.2f}")
+    m4.metric(" Świec",       str(len(candles["c"])))
 
-    # ── Wykres świecowy ───────────────────────────────────────────────────────
+    #  Wykres świecowy 
     fig = go.Figure()
 
     # Świece
@@ -2952,10 +2952,10 @@ def page_crypto() -> None:
     st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": True,
                                                              "modeBarButtonsToRemove": ["lasso2d","select2d"]})
 
-    # ── Popularne krypto ──────────────────────────────────────────────────────
+    #  Popularne krypto 
     st.markdown("---")
 
-    # ── Globalne statystyki rynku ─────────────────────────────────────────────
+    #  Globalne statystyki rynku 
     global_stats = _get("/crypto/market/global") or {}
     if global_stats:
         total_mcap = global_stats.get("total_market_cap_usd", 0)
@@ -2974,7 +2974,7 @@ def page_crypto() -> None:
         st.markdown(
             f'<div style="background:#0f172a;border:1px solid #1e3a5f;border-radius:12px;'
             f'padding:16px;margin-bottom:12px;">'
-            f'<div style="color:#64748b;font-size:12px;margin-bottom:10px;">🌍 GLOBALNY RYNEK KRYPTO</div>'
+            f'<div style="color:#64748b;font-size:12px;margin-bottom:10px;"> GLOBALNY RYNEK KRYPTO</div>'
             f'<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;text-align:center;">'
             f'<div><div style="color:#64748b;font-size:11px;">MARKET CAP</div>'
             f'<div style="color:#e2e8f0;font-weight:700;">{_fmt_big(total_mcap)}</div>'
@@ -2991,8 +2991,8 @@ def page_crypto() -> None:
             unsafe_allow_html=True,
         )
 
-    # ── Top 20 ceny z Binance/CoinGecko/CoinCap ──────────────────────────────
-    st.subheader("📊 Top Krypto — Live Ceny")
+    #  Top 20 ceny z Binance/CoinGecko/CoinCap 
+    st.subheader(" Top Krypto — Live Ceny")
     top_symbols = ["BTC","ETH","SOL","BNB","XRP","DOGE","AVAX","ADA","LINK","UNI",
                    "MATIC","NEAR","PEPE","WIF","TIA","SUI","TON","RNDR","INJ","APT"]
     syms_str = ",".join(top_symbols)
@@ -3016,7 +3016,7 @@ def page_crypto() -> None:
             vol     = d.get("volume_24h", 0)
             source  = d.get("source", "?")
             chg_c   = "#34d399" if chg >= 0 else "#f87171"
-            chg_ico = "▲" if chg >= 0 else "▼"
+            chg_ico = "" if chg >= 0 else ""
 
             price_str = f"${price:,.2f}" if price >= 1 else f"${price:.6f}"
             vol_str   = _fmt_big(vol) if vol else "—"
@@ -3031,11 +3031,11 @@ def page_crypto() -> None:
             row[4].markdown(f'<span style="color:#475569;font-size:11px">{source}</span>',
                            unsafe_allow_html=True)
 
-    # ── Trending ──────────────────────────────────────────────────────────────
+    #  Trending 
     trending = _get("/crypto/market/trending") or []
     if trending:
         st.markdown("---")
-        st.subheader("🔥 Trending (CoinGecko)")
+        st.subheader(" Trending (CoinGecko)")
         tr_cols = st.columns(len(trending))
         for i, coin in enumerate(trending):
             with tr_cols[i]:
@@ -3049,9 +3049,9 @@ def page_crypto() -> None:
                     unsafe_allow_html=True,
                 )
 
-    # ── Popularne przyciski ───────────────────────────────────────────────────
+    #  Popularne przyciski 
     st.markdown("---")
-    st.subheader("🔥 Popularne")
+    st.subheader(" Popularne")
     popular = ["BTC","ETH","SOL","BNB","XRP","DOGE","AVAX","ADA","LINK","UNI","MATIC","NEAR"]
     pop_cols = st.columns(6)
     for i, sym in enumerate(popular):
@@ -3062,43 +3062,43 @@ def page_crypto() -> None:
 
 
 def page_users() -> None:
-    st.title("👥 Użytkownicy")
+    st.title("Użytkownicy")
     if _is_viewer():
         st.warning("Tylko admin może zarządzać użytkownikami.")
         return
 
     users = _get("/users") or []
 
-    # ── Oczekujące na zatwierdzenie ───────────────────────────────────────────
+    #  Oczekujące na zatwierdzenie 
     pending = [u for u in users if not u.get("approved") and not u.get("builtin")]
     if pending:
         st.subheader(f"⏳ Oczekujące na zatwierdzenie ({len(pending)})")
         for u in pending:
             col1, col2, col3 = st.columns([3, 1, 1])
             col1.markdown(f"**{u['username']}** — `viewer` — {u.get('created_at','')[:10]}")
-            if col2.button("✅ Zatwierdź", key=f"approve_{u['username']}"):
+            if col2.button(" Zatwierdź", key=f"approve_{u['username']}"):
                 r = _post(f"/users/{u['username']}/approve", {})
                 if r and r.get("ok"):
                     st.success(f"Zatwierdzono {u['username']}")
                     st.rerun()
-            if col3.button("❌ Odrzuć", key=f"reject_{u['username']}"):
+            if col3.button(" Odrzuć", key=f"reject_{u['username']}"):
                 r = _post(f"/users/{u['username']}/reject", {})
                 if r and r.get("ok"):
                     st.warning(f"Odrzucono {u['username']}")
                     st.rerun()
         st.markdown("---")
 
-    # ── Aktywni użytkownicy ───────────────────────────────────────────────────
+    #  Aktywni użytkownicy 
     active = [u for u in users if u.get("approved") or u.get("builtin")]
-    st.subheader(f"✅ Aktywni użytkownicy ({len(active)})")
+    st.subheader(f" Aktywni użytkownicy ({len(active)})")
     for u in active:
         col1, col2 = st.columns([4, 1])
         builtin = u.get("builtin", False)
-        role_badge = "🔴 admin" if u["role"] == "admin" else "👁️ viewer"
+        role_badge = " admin" if u["role"] == "admin" else " viewer"
         builtin_badge = " *(wbudowane)*" if builtin else ""
         col1.markdown(f"**{u['username']}** — {role_badge}{builtin_badge}")
         if not builtin:
-            if col2.button("🗑️ Usuń", key=f"del_{u['username']}"):
+            if col2.button(" Usuń", key=f"del_{u['username']}"):
                 r = _delete(f"/users/{u['username']}")
                 if r and r.get("ok"):
                     st.success(f"Usunięto {u['username']}")
@@ -3120,29 +3120,29 @@ def _delete(path: str) -> dict | None:
 
 
 def page_emergency() -> None:
-    st.title("🚨 Emergency Stop")
+    st.title("Emergency Stop")
     status = _get_status()
     estop  = status.get("emergency_stop", False) if status else False
 
     if estop:
-        st.error("## 🚨 EMERGENCY STOP JEST AKTYWNY")
+        st.error("## Emergency Stop JEST AKTYWNY")
         st.markdown("System nie otwiera nowych pozycji.")
         st.markdown("---")
-        st.subheader("🔓 Odblokuj system")
+        st.subheader(" Odblokuj system")
         pwd = st.text_input("Hasło odblokowania", type="password")
-        if st.button("✅ Odblokuj Emergency Stop", type="primary"):
+        if st.button(" Odblokuj Emergency Stop", type="primary"):
             r = _post("/emergency/clear", {"password": pwd})
             if r and r.get("ok"):
-                st.success("✅ System odblokowany")
+                st.success(" System odblokowany")
                 st.rerun()
             else:
-                st.error("❌ Błędne hasło lub błąd API")
+                st.error(" Błędne hasło lub błąd API")
     else:
-        st.success("✅ System działa normalnie")
+        st.success(" System działa normalnie")
         st.markdown("---")
 
         st.markdown("""
-        ### ⚠️ Emergency Stop zatrzyma:
+        ###  Emergency Stop zatrzyma:
         - Otwieranie nowych pozycji przez wszystkich agentów
         - Składanie nowych zleceń
         
@@ -3156,25 +3156,25 @@ def page_emergency() -> None:
 
         st.markdown('<div class="emergency-btn">', unsafe_allow_html=True)
         if not _is_viewer():
-            if st.button("🚨 AKTYWUJ EMERGENCY STOP", type="primary", use_container_width=True):
+            if st.button(" AKTYWUJ EMERGENCY STOP", type="primary", use_container_width=True):
                 if not pwd:
-                    st.error("❌ Wpisz hasło Emergency Stop")
+                    st.error(" Wpisz hasło Emergency Stop")
                 else:
                     r = _post("/emergency/stop", {
                         "password":        pwd,
                         "close_positions": close_pos,
                     })
                     if r and r.get("ok"):
-                        st.error("🚨 EMERGENCY STOP AKTYWOWANY")
+                        st.error("Emergency Stop AKTYWOWANY")
                         st.rerun()
                     else:
-                        st.error(f"❌ {r.get('detail', 'Błąd') if r else 'Brak połączenia'}")
+                        st.error(f" {r.get('detail', 'Błąd') if r else 'Brak połączenia'}")
         st.markdown("</div>", unsafe_allow_html=True)
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# 
 # Router – główna logika
-# ══════════════════════════════════════════════════════════════════════════════
+# 
 def main() -> None:
     # Reset cache statusu przy każdym odświeżeniu
     st.session_state.pop("cached_status", None)
@@ -3197,7 +3197,7 @@ def main() -> None:
             # Logo i tytuł
             st.markdown("""
             <div style="text-align:center;margin-bottom:32px;">
-                <div style="font-size:48px;margin-bottom:8px;">⚡</div>
+                <div style="font-size:48px;margin-bottom:8px;"></div>
                 <div style="font-size:24px;font-weight:700;color:#93c5fd;margin-bottom:4px;">IBKR Trading System</div>
                 <div style="font-size:13px;color:#475569;">Multi-Agent AI Trading Platform</div>
             </div>
@@ -3206,7 +3206,7 @@ def main() -> None:
             # Karta
             with st.container(border=True):
                 if not st.session_state.show_register:
-                    st.markdown("#### 🔐 Logowanie")
+                    st.markdown("####  Logowanie")
                     username = st.text_input("Login", placeholder="Wpisz login", label_visibility="collapsed")
                     password = st.text_input("Hasło", type="password", placeholder="Wpisz hasło", label_visibility="collapsed")
                     st.markdown("")
@@ -3249,7 +3249,7 @@ def main() -> None:
                     st.markdown("</div>", unsafe_allow_html=True)
 
                 else:
-                    st.markdown("#### 📝 Rejestracja")
+                    st.markdown("####  Rejestracja")
                     st.caption("Konto wymaga zatwierdzenia przez admina.")
                     new_user  = st.text_input("Login", placeholder="min. 3 znaki, litery i cyfry")
                     new_pass  = st.text_input("Hasło", type="password", placeholder="min. 6 znaków")
@@ -3316,3 +3316,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+

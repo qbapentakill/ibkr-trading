@@ -362,6 +362,67 @@ async def run_system(no_agents: bool = False) -> None:
 
     asyncio.create_task(_status_ticker())
 
+    # ── Coach auto-review live trades co godzinę ──────────────────────────────
+    async def _coach_review_loop():
+        """Coach analizuje wypełnione zlecenia live co godzinę."""
+        await asyncio.sleep(300)  # Poczekaj 5 min na start
+        while True:
+            try:
+                from agents.auxiliary.coach import get_coach
+                from database.models import DBOrder, DBSignal
+                from sqlalchemy import select, and_
+                from datetime import timedelta
+                
+                coach = get_coach()
+                
+                async with get_session() as session:
+                    cutoff = datetime.datetime.now() - timedelta(hours=1)
+                    result = await session.execute(
+                        select(DBOrder).where(
+                            and_(
+                                DBOrder.status == "filled",
+                                DBOrder.created_at >= cutoff,
+                            )
+                        ).limit(50)
+                    )
+                    orders = result.scalars().all()
+                    
+                    for order in orders:
+                        # Znajdź sygnał który utworzył to zlecenie
+                        sig_result = await session.execute(
+                            select(DBSignal).where(
+                                and_(
+                                    DBSignal.symbol == order.symbol,
+                                    DBSignal.timestamp <= order.created_at,
+                                )
+                            ).order_by(desc(DBSignal.timestamp)).limit(1)
+                        )
+                        signal = sig_result.scalars().first()
+                        
+                        if signal and signal.entry_price and order.avg_price:
+                            # Oblicz PnL
+                            if order.side == "BUY":
+                                pnl_usd = (order.avg_price - signal.entry_price) * order.filled_qty
+                            else:
+                                pnl_usd = (signal.entry_price - order.avg_price) * order.filled_qty
+                            
+                            pnl_pct = (pnl_usd / (signal.entry_price * order.filled_qty)) * 100
+                            
+                            coach.review_trade(
+                                agent_name = signal.agent_name,
+                                symbol     = order.symbol,
+                                direction  = "LONG" if order.side == "BUY" else "SHORT",
+                                pnl_usd    = pnl_usd,
+                                pnl_pct    = pnl_pct,
+                                trade_id   = order.order_id,
+                            )
+            except Exception as e:
+                log.warning("Coach review loop error: {}", e)
+            
+            await asyncio.sleep(3600)  # Co godzinę
+    
+    asyncio.create_task(_coach_review_loop())
+
     try:
         await server.serve()
     except asyncio.CancelledError:

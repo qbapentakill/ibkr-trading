@@ -743,6 +743,67 @@ async def reset_coach_agent(agent_name: str, user: str = Depends(get_current_use
     return {"ok": True, "agent": agent_name}
 
 
+@router.post("/coach/review-live", tags=["coach"])
+async def review_live_trades(user: str = Depends(get_current_user)):
+    """Analizuje wypełnione live zlecenia i wysyła do Coach."""
+    from agents.auxiliary.coach import get_coach
+    from database.models import DBOrder, DBSignal
+    from sqlalchemy import select, and_
+    
+    coach = get_coach()
+    reviewed_count = 0
+    
+    async with get_session() as session:
+        # Znajdź zlecenia wypełnione w ostatnich 24h, które nie były jeszcze ocenione
+        cutoff = datetime.now() - timedelta(hours=24)
+        result = await session.execute(
+            select(DBOrder).where(
+                and_(
+                    DBOrder.status == "filled",
+                    DBOrder.created_at >= cutoff,
+                )
+            ).order_by(desc(DBOrder.created_at)).limit(100)
+        )
+        orders = result.scalars().all()
+        
+        for order in orders:
+            # Znajdź powiązany sygnał żeby poznać PnL
+            sig_result = await session.execute(
+                select(DBSignal).where(
+                    and_(
+                        DBSignal.symbol == order.symbol,
+                        DBSignal.agent_name.like(f"%{order.symbol}%"),  # heurystyka
+                    )
+                ).order_by(desc(DBSignal.timestamp)).limit(1)
+            )
+            signal = sig_result.scalars().first()
+            
+            if not signal or not signal.entry_price:
+                continue
+                
+            # Oblicz PnL
+            if order.avg_price and order.filled_qty:
+                if order.side == "BUY":  # LONG
+                    pnl_usd = (order.avg_price - signal.entry_price) * order.filled_qty
+                else:  # SHORT
+                    pnl_usd = (signal.entry_price - order.avg_price) * order.filled_qty
+                    
+                pnl_pct = (pnl_usd / (signal.entry_price * order.filled_qty)) * 100 if signal.entry_price else 0
+                
+                # Wyślij do Coach
+                coach.review_trade(
+                    agent_name = signal.agent_name,
+                    symbol     = order.symbol,
+                    direction  = "LONG" if order.side == "BUY" else "SHORT",
+                    pnl_usd    = pnl_usd,
+                    pnl_pct    = pnl_pct,
+                    trade_id   = order.order_id,
+                )
+                reviewed_count += 1
+    
+    return {"ok": True, "reviewed_trades": reviewed_count}
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # ══════════════════════════════════════════════════════════════════════════════
 # Crypto — public API (CoinGecko / Binance / CoinCap — bez klucza)
