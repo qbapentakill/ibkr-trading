@@ -109,9 +109,9 @@ st.markdown("""
         min-height: 100vh;
     }
     .main .block-container { 
-        padding: 2rem 3rem 6rem 3rem; 
+        padding: 2rem 3rem 10rem 3rem; 
         max-width: 100%; 
-        min-height: calc(100vh - 44px);
+        min-height: 100vh;
     }
 
     /*  Ticker bar  */
