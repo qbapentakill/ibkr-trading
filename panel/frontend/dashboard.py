@@ -1418,12 +1418,76 @@ def page_news() -> None:
             st.markdown("---")
 
 
+def _groq_direct(message: str, history: list) -> str:
+    """Wywołuje Groq bezpośrednio z panelu — bez pośrednika API."""
+    import os, requests as _req
+    api_key = os.environ.get("GROQ_API_KEY", "")
+    if not api_key:
+        # Spróbuj wczytać z .env
+        try:
+            with open("/opt/ibkr/.env") as f:
+                for line in f:
+                    if line.startswith("GROQ_API_KEY="):
+                        api_key = line.strip().split("=", 1)[1]
+                        break
+        except Exception:
+            pass
+    if not api_key:
+        return "❌ Brak klucza GROQ_API_KEY w .env"
+
+    # Pobierz kontekst systemu
+    status = _get("/status") or {}
+    positions = _get("/positions") or []
+    n_pos = len(positions) if isinstance(positions, list) else 0
+    capital = status.get("account", {}).get("net_liquidation", 0)
+    pnl = status.get("daily_pnl", 0)
+
+    system_prompt = f"""Jesteś inteligentnym asystentem AI systemu automatycznego tradingu IBKR Multi-Agent Trading System.
+
+AKTUALNY STAN SYSTEMU:
+- Kapitał: ${capital:,.2f}
+- Dzienny PnL: ${pnl:,.2f}
+- Otwarte pozycje: {n_pos}
+- Tryb: PAPER TRADING (symulacja)
+- Emergency Stop: {"AKTYWNY" if status.get("emergency_stop") else "Nieaktywny"}
+
+MOŻESZ ODPOWIADAĆ NA:
+- Pytania o rynek (akcje, krypto, ETF, forex, surowce)
+- Analizę techniczną (RSI, MACD, Bollinger Bands, EMA, ADX)
+- Strategie tradingowe (trend following, mean reversion, scalping)
+- Makroekonomię (Fed, inflacja, stopy procentowe)
+- Wyniki i działanie agentów w systemie
+- Zarządzanie ryzykiem
+- Ogólne pytania finansowe i inwestycyjne
+
+AGENCI: TrendFollower, MeanReversion, Scalper, BreakoutHunter, SentimentTrader, OptionsFlow, GapTrader, MomentumSurfer, VIXTrader, DivergenceHunter, ScalpKing, WhaleTracker + 12 analitycznych
+
+Odpowiadaj po POLSKU. Bądź konkretny, pomocny i profesjonalny jak doświadczony trader."""
+
+    messages = [{"role": "system", "content": system_prompt}]
+    for h in history[-10:]:
+        messages.append({"role": h["role"], "content": h["content"]})
+    messages.append({"role": "user", "content": message})
+
+    try:
+        resp = _req.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json={"model": "llama-3.3-70b-versatile", "messages": messages, "temperature": 0.4, "max_tokens": 2000},
+            timeout=30,
+        )
+        data = resp.json()
+        if resp.status_code == 200:
+            return data["choices"][0]["message"]["content"]
+        else:
+            return f"❌ Błąd Groq: {data.get('error', {}).get('message', str(data))}"
+    except Exception as e:
+        return f"❌ Błąd połączenia z Groq: {e}"
+
+
 def page_ai_chat() -> None:
-    st.title("🤖 AI Chat – sterowanie głosem poleceń")
-    st.caption(
-        "Możesz pisać naturalnym językiem: 'wyłącz Scalper', "
-        "'ile wynosi PnL?', 'ustaw limit straty na 400$', itp."
-    )
+    st.title("🤖 AI Chat – asystent tradingowy")
+    st.caption("Pytaj o rynek, strategie, krypto, agentów — odpowiem na wszystko 🧠")
 
     # Historia czatu
     chat_container = st.container()
@@ -1446,43 +1510,16 @@ def page_ai_chat() -> None:
     with st.form("chat_form", clear_on_submit=True):
         c1, c2 = st.columns([5, 1])
         user_input = c1.text_input(
-            "Wiadomość", placeholder="Np: 'pokaż status systemu' lub 'wyłącz Scalper'",
+            "Wiadomość", placeholder="Np: 'co sądzisz o NVDA?', 'jak działa RSI?', 'status systemu'",
             label_visibility="collapsed"
         )
         send = c2.form_submit_button("📨 Wyślij", use_container_width=True)
 
     if send and user_input.strip():
-        # Dodaj do historii
-        st.session_state.chat_history.append({
-            "role": "user", "content": user_input
-        })
-
-        # Wywołaj API
+        st.session_state.chat_history.append({"role": "user", "content": user_input})
         with st.spinner("AI myśli…"):
-            result = _post("/chat", {
-                "message": user_input,
-                "history": st.session_state.chat_history[-10:],
-            })
-
-        if result:
-            response = result.get("response", "Brak odpowiedzi")
-            action   = result.get("action_taken")
-            confirm  = result.get("requires_confirmation", False)
-
-            st.session_state.chat_history.append({
-                "role": "assistant", "content": response
-            })
-
-            if action:
-                st.success(f"✅ Wykonano akcję: `{action}`")
-            if confirm:
-                st.warning("⚠️ Akcja wymaga potwierdzenia – odpisz 'tak' lub 'nie'")
-        else:
-            st.session_state.chat_history.append({
-                "role": "assistant",
-                "content": "❌ Błąd połączenia z API. Sprawdź czy system działa."
-            })
-
+            response = _groq_direct(user_input, st.session_state.chat_history[:-1])
+        st.session_state.chat_history.append({"role": "assistant", "content": response})
         st.rerun()
 
     # Przycisk czyszczenia historii
@@ -1492,23 +1529,19 @@ def page_ai_chat() -> None:
             st.rerun()
 
     # Podpowiedzi szybkich komend
-    st.markdown("### 💡 Szybkie komendy")
+    st.markdown("### 💡 Szybkie pytania")
     quick_cmds = [
-        "status systemu", "pokaż pozycje", "ostatnie sygnały",
-        "wyłącz Scalper", "włącz TrendFollower",
-        "ustaw limit straty na 500$", "pokaż wydajność agentów",
-        "jaki jest PnL?", "pokaż newsy HIGH impact",
+        "Co sądzisz o NVDA teraz?", "Jak działa RSI?", "Co to jest short selling?",
+        "Jaki jest status systemu?", "Wyjaśnij strategię mean reversion", "Co to jest VIX?",
+        "Jakie są najlepsze ETF-y?", "Co to jest market cap?", "Jak czytać wykres świecowy?",
     ]
     cols = st.columns(3)
     for i, cmd in enumerate(quick_cmds):
         if cols[i % 3].button(f"▶ {cmd}", key=f"quick_{i}"):
             st.session_state.chat_history.append({"role": "user", "content": cmd})
             with st.spinner("…"):
-                result = _post("/chat", {"message": cmd, "history": []})
-            if result:
-                st.session_state.chat_history.append({
-                    "role": "assistant", "content": result.get("response", "")
-                })
+                response = _groq_direct(cmd, [])
+            st.session_state.chat_history.append({"role": "assistant", "content": response})
             st.rerun()
 
 
