@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Bot - Pricing</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            padding: 60px 0;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+
+        .pricing-toggle {
+            display: inline-flex;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 5px;
+            margin-bottom: 40px;
+        }
+
+        .pricing-toggle button {
+            padding: 12px 30px;
+            border: none;
+            background: transparent;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.3s;
+        }
+
+        .pricing-toggle button.active {
+            background: white;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .pricing-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .pricing-card.featured {
+            border: 3px solid #667eea;
+        }
+
+        .badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .tier-name {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .tier-description {
+            color: #666;
+            margin-bottom: 30px;
+            min-height: 48px;
+        }
+
+        .price {
+            font-size: 3em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .price-period {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .features {
+            list-style: none;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .features li {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+        }
+
+        .features li:before {
+            content: "✓";
+            color: #4CAF50;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+
+        .features li.disabled {
+            opacity: 0.4;
+        }
+
+        .features li.disabled:before {
+            content: "✗";
+            color: #999;
+        }
+
+        .cta-button {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .cta-button.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .cta-button.secondary {
+            background: #f0f0f0;
+            color: #667eea;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .cta-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .comparison {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-top: 60px;
+        }
+
+        .comparison h2 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 40px;
+            font-size: 2em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .check {
+            color: #4CAF50;
+            font-size: 1.5em;
+        }
+
+        .faq {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-top: 40px;
+        }
+
+        .faq h2 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 40px;
+            font-size: 2em;
+        }
+
+        .faq-item {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .faq-question {
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .faq-answer {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: white;
+        }
+
+        .money-back {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 40px 0;
+            color: white;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            
+            .pricing-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Choose Your Plan</h1>
+            <p class="subtitle">Start trading smarter with AI-powered bots</p>
+            
+            <div class="pricing-toggle">
+                <button class="active" onclick="toggleBilling('monthly')">Monthly</button>
+                <button onclick="toggleBilling('yearly')">Yearly (Save 20%)</button>
+            </div>
+
+            <div class="money-back">
+                <strong>💰 30-Day Money-Back Guarantee</strong><br>
+                Not satisfied? Get a full refund, no questions asked.
+            </div>
+        </header>
+
+        <div class="pricing-cards">
+            <!-- BASIC -->
+            <div class="pricing-card">
+                <div class="tier-name">Basic</div>
+                <div class="tier-description">Perfect for beginners starting their trading journey</div>
+                <div class="price">
+                    $<span class="price-amount">49</span>
+                    <span class="price-period">/month</span>
+                </div>
+                
+                <ul class="features">
+                    <li><strong>2 Trading Bots</strong></li>
+                    <li>Scalper</li>
+                    <li>Trend Follower</li>
+                    <li>Paper & Live Trading</li>
+                    <li>Web Dashboard</li>
+                    <li>Email Support</li>
+                    <li class="disabled">Advanced Bots</li>
+                    <li class="disabled">Auxiliary Agents</li>
+                    <li class="disabled">Priority Support</li>
+                </ul>
+
+                <button class="cta-button secondary" 
+                        onclick="checkout('basic', 'monthly')"
+                        data-tier="basic">
+                    Start Free Trial
+                </button>
+            </div>
+
+            <!-- PRO (Featured) -->
+            <div class="pricing-card featured">
+                <div class="badge">MOST POPULAR</div>
+                <div class="tier-name">Pro</div>
+                <div class="tier-description">Best value for serious traders</div>
+                <div class="price">
+                    $<span class="price-amount">99</span>
+                    <span class="price-period">/month</span>
+                </div>
+                
+                <ul class="features">
+                    <li><strong>5 Trading Bots</strong></li>
+                    <li>All Basic bots +</li>
+                    <li>Mean Reversion</li>
+                    <li>Breakout Hunter</li>
+                    <li>Momentum Surfer</li>
+                    <li>Advanced Risk Management</li>
+                    <li>Telegram Alerts</li>
+                    <li>Priority Email Support</li>
+                    <li class="disabled">All 11 Bots</li>
+                    <li class="disabled">Auxiliary Agents</li>
+                </ul>
+
+                <button class="cta-button primary" 
+                        onclick="checkout('pro', 'monthly')"
+                        data-tier="pro">
+                    Start Free Trial
+                </button>
+            </div>
+
+            <!-- ELITE -->
+            <div class="pricing-card">
+                <div class="tier-name">Elite</div>
+                <div class="tier-description">Maximum firepower for professionals</div>
+                <div class="price">
+                    $<span class="price-amount">199</span>
+                    <span class="price-period">/month</span>
+                </div>
+                
+                <ul class="features">
+                    <li><strong>All 11 Trading Bots</strong></li>
+                    <li>All Pro bots +</li>
+                    <li>Gap Trader</li>
+                    <li>Divergence Hunter</li>
+                    <li>VIX Trader</li>
+                    <li>Sentiment Trader</li>
+                    <li>Options Flow</li>
+                    <li>Scalp King</li>
+                    <li><strong>4 Auxiliary Agents</strong></li>
+                    <li>News Analyst</li>
+                    <li>Whale Tracker</li>
+                    <li>Market Analyst</li>
+                    <li>Smart Money Tracker</li>
+                    <li>24/7 Priority Support</li>
+                    <li>Custom Strategy Tuning</li>
+                </ul>
+
+                <button class="cta-button primary" 
+                        onclick="checkout('elite', 'monthly')"
+                        data-tier="elite">
+                    Start Free Trial
+                </button>
+            </div>
+        </div>
+
+        <!-- Comparison Table -->
+        <div class="comparison">
+            <h2>📊 Feature Comparison</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Basic</th>
+                        <th>Pro</th>
+                        <th>Elite</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Trading Bots</td>
+                        <td>2</td>
+                        <td>5</td>
+                        <td>11</td>
+                    </tr>
+                    <tr>
+                        <td>Auxiliary Agents</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Paper Trading</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Live Trading</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Web Dashboard</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Docker Deployment</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Telegram Alerts</td>
+                        <td>-</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Email Support</td>
+                        <td>24h response</td>
+                        <td>12h response</td>
+                        <td>1h response</td>
+                    </tr>
+                    <tr>
+                        <td>Custom Tuning</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- FAQ -->
+        <div class="faq">
+            <h2>❓ Frequently Asked Questions</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question">Is there a free trial?</div>
+                <div class="faq-answer">
+                    Yes! All plans include a 7-day free trial. No credit card required. Cancel anytime.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Can I change my plan later?</div>
+                <div class="faq-answer">
+                    Absolutely. Upgrade or downgrade anytime. Changes take effect immediately.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Do I need my own broker account?</div>
+                <div class="faq-answer">
+                    Yes. You'll need an Alpaca account (free to create). The bot runs on your own infrastructure and connects to your account.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Is my API key secure?</div>
+                <div class="faq-answer">
+                    Yes. The bot runs on YOUR computer/server. Your API keys never leave your machine. We never see or store them.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What's the refund policy?</div>
+                <div class="faq-answer">
+                    30-day money-back guarantee. If you're not satisfied for any reason, we'll refund your payment in full.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Can I run multiple bots on different accounts?</div>
+                <div class="faq-answer">
+                    Each license is for one trading account. Need multiple? Contact us for volume pricing.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Trading Bot. All rights reserved.</p>
+        <p style="margin-top: 10px;">
+            <a href="/terms" style="color: white; margin: 0 10px;">Terms</a> |
+            <a href="/privacy" style="color: white; margin: 0 10px;">Privacy</a> |
+            <a href="/docs" style="color: white; margin: 0 10px;">Documentation</a>
+        </p>
+    </footer>
+
+    <script>
+        // Stripe publishable key
+        const stripe = Stripe('pk_test_51UFuRgCKPcPHEzMmAL307bAduIHuMwOGfg0norOwbIReJYpxI5RQYrZP4GLgOPv3C9DIesmfCcpUUgKU3VzGDNYK00kAz1sdkK');
+
+        // Price IDs from Stripe
+        const PRICES = {
+            monthly: {
+                basic: 'price_1UFuYgCKPcPHEzMm6htCp0qE',
+                pro: 'price_1UFubWCKPcPHEzMm2rvdIE53',
+                elite: 'price_1UFuaTCKPcPHEzMmKJ1LTPcJ'
+            },
+            yearly: {
+                basic: 'price_1UFuYgCKPcPHEzMm6htCp0qE', // Same for now (no yearly created)
+                pro: 'price_1UFubWCKPcPHEzMm2rvdIE53',
+                elite: 'price_1UFuaTCKPcPHEzMmKJ1LTPcJ'
+            }
+        };
+
+        let billingPeriod = 'monthly';
+
+        function toggleBilling(period) {
+            billingPeriod = period;
+            
+            // Update button states
+            document.querySelectorAll('.pricing-toggle button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update prices
+            const prices = period === 'yearly' 
+                ? {basic: 39, pro: 79, elite: 159}
+                : {basic: 49, pro: 99, elite: 199};
+
+            document.querySelectorAll('.price-amount').forEach((el, i) => {
+                const tier = ['basic', 'pro', 'elite'][i];
+                el.textContent = prices[tier];
+            });
+
+            // Update periods
+            const periodText = period === 'yearly' ? '/month (billed yearly)' : '/month';
+            document.querySelectorAll('.price-period').forEach(el => {
+                el.textContent = periodText;
+            });
+        }
+
+        async function checkout(tier, period) {
+            const button = event.target;
+            button.disabled = true;
+            button.textContent = 'Loading...';
+
+            try {
+                // Get price ID
+                const priceId = PRICES[period][tier];
+
+                // Create Checkout Session on backend
+                const response = await fetch('https://trading-bot-backend-mdo2.onrender.com/create-checkout-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        priceId: priceId,
+                        tier: tier
+                    })
+                });
+
+                const session = await response.json();
+
+                // Redirect to Stripe Checkout
+                const result = await stripe.redirectToCheckout({
+                    sessionId: session.id
+                });
+
+                if (result.error) {
+                    alert(result.error.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Something went wrong. Please try again.');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Start Free Trial';
+            }
+        }
+
+        // Track page views (optional analytics)
+        console.log('Pricing page loaded');
+    </script>
+</body>
+</html>
