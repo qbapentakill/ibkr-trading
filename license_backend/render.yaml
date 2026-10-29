@@ -4,6 +4,8 @@ services:
     runtime: python
     plan: free
     region: oregon
+    pythonVersion: "3.11.9"
+    rootDir: license_backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
