@@ -224,6 +224,21 @@ async def stripe_webhook(request: Request):
         session_id     = session.get("id")
         metadata       = session.get("metadata", {})
 
+        # Fallback: pobierz email z obiektu customer_details
+        if not customer_email:
+            customer_details = session.get("customer_details", {})
+            customer_email = customer_details.get("email")
+
+        # Fallback 2: pobierz email przez Stripe API z customer ID
+        if not customer_email:
+            customer_id = session.get("customer")
+            if customer_id:
+                try:
+                    customer = stripe.Customer.retrieve(customer_id)
+                    customer_email = customer.get("email")
+                except Exception:
+                    pass
+
         # Tier bierzemy z metadata (ustawiamy przy tworzeniu sesji checkout)
         # Fallback: szacujemy po kwocie
         tier = metadata.get("tier")
