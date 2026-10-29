@@ -150,3 +150,70 @@ class DBAlert(Base):
     source    = Column(String(100), default="system")
     sent      = Column(Boolean, default=False)
     timestamp = Column(DateTime, default=datetime.utcnow, index=True)
+
+
+class DBEquitySnapshot(Base):
+    """
+    Snapshot equity co 1 minutę - fundament historycznych wykresów PnL.
+    Zapisuje: kapitał całkowity, dzienny PnL, PnL per agent.
+    """
+    __tablename__ = "equity_snapshots"
+
+    id                = Column(Integer, primary_key=True, autoincrement=True)
+    timestamp         = Column(DateTime, default=datetime.utcnow, index=True)
+    net_liquidation   = Column(Float, default=0.0)   # całkowity kapitał
+    daily_pnl         = Column(Float, default=0.0)   # dzienny PnL
+    unrealized_pnl    = Column(Float, default=0.0)   # niezrealizowany PnL
+    realized_pnl      = Column(Float, default=0.0)   # zrealizowany PnL
+    drawdown_pct      = Column(Float, default=0.0)   # drawdown %
+    open_positions    = Column(Integer, default=0)   # liczba otwartych pozycji
+    agent_pnl         = Column(JSON, default=dict)   # {agent_name: pnl_float}
+    paper_mode        = Column(Boolean, default=True)
+
+
+class DBSystemMetric(Base):
+    """
+    Metryki systemowe co 1 minutę.
+    CPU, RAM, latency API, status połączeń.
+    """
+    __tablename__ = "system_metrics"
+
+    id              = Column(Integer, primary_key=True, autoincrement=True)
+    timestamp       = Column(DateTime, default=datetime.utcnow, index=True)
+    cpu_pct         = Column(Float, default=0.0)
+    ram_pct         = Column(Float, default=0.0)
+    ram_mb          = Column(Float, default=0.0)
+    ibkr_connected  = Column(Boolean, default=False)
+    ibkr_latency_ms = Column(Float, nullable=True)   # czas odpowiedzi IBKR
+    api_latency_ms  = Column(Float, nullable=True)   # czas odpowiedzi backendu
+    active_agents   = Column(Integer, default=0)
+    signals_today   = Column(Integer, default=0)
+    orders_today    = Column(Integer, default=0)
+    errors_today    = Column(Integer, default=0)
+
+
+class DBAgentEvent(Base):
+    """
+    Rejestr wszystkich zdarzeń agentów - kompletna historia decyzji systemu.
+    To jest główny 'rejestrator posunięć' o który prosiłeś.
+    """
+    __tablename__ = "agent_events"
+
+    id          = Column(Integer, primary_key=True, autoincrement=True)
+    timestamp   = Column(DateTime, default=datetime.utcnow, index=True)
+    agent_name  = Column(String(50), nullable=False, index=True)
+    event_type  = Column(String(50), nullable=False, index=True)
+    # Typy: signal_generated, signal_approved, signal_rejected,
+    #       order_placed, order_filled, order_cancelled,
+    #       position_opened, position_closed,
+    #       agent_started, agent_stopped, agent_error,
+    #       risk_triggered, emergency_stop
+    symbol      = Column(String(20), nullable=True, index=True)
+    direction   = Column(String(10), nullable=True)   # BUY/SELL
+    price       = Column(Float, nullable=True)
+    quantity    = Column(Float, nullable=True)
+    pnl         = Column(Float, nullable=True)         # PnL przy zamknięciu
+    confidence  = Column(Float, nullable=True)         # confidence sygnału
+    reasoning   = Column(Text, nullable=True)          # reasoning agenta
+    details     = Column(JSON, default=dict)           # wszystkie dodatkowe dane
+    paper_mode  = Column(Boolean, default=True)

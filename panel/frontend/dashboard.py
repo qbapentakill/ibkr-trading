@@ -9,6 +9,21 @@ from __future__ import annotations
 
 import streamlit as st
 
+# Import stron developerskich
+try:
+    from panel.frontend.dev_pages import (
+        page_dev_monitor,
+        page_pnl_timeline,
+        page_logs_pro,
+        page_signals_pro,
+        page_system_health,
+        page_dev_export,
+    )
+    _DEV_PAGES_LOADED = True
+except ImportError as _e:
+    _DEV_PAGES_LOADED = False
+    import traceback; traceback.print_exc()
+
 # 
 # Konfiguracja strony (MUSI być pierwsza komenda Streamlit)
 # 
@@ -733,6 +748,13 @@ def render_top_nav() -> None:
         ("Rynki", "Rynki"),
         ("Krypto", "Krypto"),
         ("Logi", "Logi"),
+        # ── DEV PANEL ──────────────────────────────
+        ("🔍 Dev Monitor",  "Dev Monitor"),
+        ("📈 PnL Timeline", "PnL Timeline"),
+        ("📂 Logi PRO",     "Logi PRO"),
+        ("🎯 Sygnały PRO",  "Sygnały PRO"),
+        ("💻 System Health","System Health"),
+        ("⬇️ Export",       "Export"),
     ]
     if not _is_viewer():
         more_pages += [("Użytkownicy", "Uzytkownicy"), ("Emergency", "Emergency")]
@@ -3434,6 +3456,22 @@ def main() -> None:
         "Rynki":         page_markets,
         "Emergency":     page_emergency,
     }
+    # ── Dev Panel (ładowane dynamicznie) ─────────────────────────────────────
+    if _DEV_PAGES_LOADED:
+        dispatch.update({
+            "Dev Monitor":   page_dev_monitor,
+            "PnL Timeline":  page_pnl_timeline,
+            "Logi PRO":      page_logs_pro,
+            "Sygnały PRO":   page_signals_pro,
+            "System Health": page_system_health,
+            "Export":        page_dev_export,
+        })
+    else:
+        for key in ("Dev Monitor", "PnL Timeline", "Logi PRO",
+                    "Sygnały PRO", "System Health", "Export"):
+            dispatch[key] = lambda: st.error(
+                "⚠️ Dev pages nie załadowane. Sprawdź logi konsoli."
+            )
     dispatch.get(page, page_dashboard)()
 
 

@@ -10,8 +10,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from core.logger import setup_logging, get_logger
+from core.metrics_collector import metrics_collector
 from database.database import init_db
 from panel.api.routes import router
+from panel.api.dev_routes import router as dev_router
 
 log = get_logger(__name__)
 
@@ -20,8 +22,12 @@ log = get_logger(__name__)
 async def lifespan(app: FastAPI):
     setup_logging()
     await init_db()
-    log.info("FastAPI backend uruchomiony")
+    # Uruchom MetricsCollector jako background task
+    import asyncio
+    asyncio.create_task(metrics_collector.run())
+    log.info("FastAPI backend uruchomiony (MetricsCollector aktywny)")
     yield
+    metrics_collector.stop()
     log.info("FastAPI backend zatrzymany")
 
 
@@ -41,6 +47,7 @@ app.add_middleware(
 )
 
 app.include_router(router, prefix="/api")
+app.include_router(dev_router, prefix="/api")
 
 
 @app.get("/health")
