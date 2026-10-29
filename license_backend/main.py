@@ -186,18 +186,14 @@ async def verify_license(request: VerifyRequest):
         raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.post("/webhook/stripe")
-async def stripe_webhook(request: Request, stripe_signature: str = Header(None)):
+async def stripe_webhook(request: Request):
     """
     Stripe webhook - tworzy nową licencję po płatności
-
-    Setup w Stripe Dashboard:
-    1. Webhooks → Add endpoint
-    2. URL: https://TWOJA-NAZWA.onrender.com/webhook/stripe
-    3. Events: checkout.session.completed, customer.subscription.deleted
     """
     import stripe
 
     payload = await request.body()
+    stripe_signature = request.headers.get("stripe-signature") or request.headers.get("Stripe-Signature")
 
     # Weryfikacja podpisu Stripe (WAŻNE - bez tego ktoś może sfałszować webhook)
     try:
