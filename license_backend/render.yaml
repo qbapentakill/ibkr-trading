@@ -3,8 +3,10 @@ services:
     name: trading-bot-backend
     runtime: python
     plan: free
+    region: oregon
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
     envVars:
       - key: SUPABASE_URL
         sync: false
@@ -17,6 +19,8 @@ services:
       - key: RESEND_API_KEY
         sync: false
       - key: FROM_EMAIL
-        value: noreply@resend.dev
+        value: onboarding@resend.dev
       - key: FROM_NAME
         value: Trading Bot
+      - key: FRONTEND_URL
+        sync: false
