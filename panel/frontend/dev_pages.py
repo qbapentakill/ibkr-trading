@@ -633,7 +633,7 @@ def _render_log_tab(filename: str, label: str) -> None:
             colored_lines.append(f"[ERR] {line}")
         elif "WARNING" in line:
             colored_lines.append(f"[WRN] {line}")
-        elif "SUCCESS" in line or "✓" in line or "filled" in line.lower():
+        elif "SUCCESS" in line or "[OK]" in line or "filled" in line.lower():
             colored_lines.append(f"[OK]  {line}")
         else:
             colored_lines.append(f"      {line}")

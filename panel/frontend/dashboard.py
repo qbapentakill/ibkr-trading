@@ -693,10 +693,10 @@ def page_login() -> None:
         </div>
         """, unsafe_allow_html=True)
         st.markdown("")
-        username = st.text_input(" Login", value="admin", placeholder="Nazwa użytkownika")
-        password = st.text_input(" Hasło", type="password", placeholder="Hasło")
+        username = st.text_input("Login", value="admin", placeholder="Nazwa użytkownika")
+        password = st.text_input("Hasło", type="password", placeholder="Hasło")
         st.markdown("")
-        if st.button(" Zaloguj się", use_container_width=True, type="primary"):
+        if st.button("Zaloguj się", use_container_width=True, type="primary"):
             try:
                 r = requests.post(
                     f"{st.session_state.api_base}/auth/token",
@@ -709,9 +709,9 @@ def page_login() -> None:
                     st.session_state.username  = username
                     st.rerun()
                 else:
-                    st.error(" Nieprawidłowy login lub hasło")
+                    st.error("Nieprawidłowy login lub hasło")
             except Exception as e:
-                st.warning(f" Nie można połączyć z API: {e}\n\nUruchom system: `python main.py`")
+                st.warning(f"Nie można połączyć z API: {e}\n\nUruchom system: `python main.py`")
 
 
 # 
@@ -1250,7 +1250,7 @@ def _render_live_dashboard(s: dict) -> None:
     st.markdown("---")
 
     #  Live sygnały przez JS 
-    st.subheader(" Ostatnie sygnały — Live")
+    st.subheader("Ostatnie sygnały — Live")
     st.markdown(f"""
     <div id="live-signals-container">
         <div style="color:#475569;padding:20px;text-align:center;">Ładowanie sygnałów...</div>
@@ -1370,8 +1370,8 @@ def page_agents() -> None:
         for name, data in group_agents.items():
                 cfg   = data["config"]
                 state = data["state"]
-                status_icon = "[●]" if state["status"] == "active" else \
-                              "" if state["status"] == "error"  else ""
+                status_icon = "[ON]" if state["status"] == "active" else \
+                              "[ERR]" if state["status"] == "error"  else "[OFF]"
                 desc  = AGENT_DESC.get(name, "")
                 # Unikalny klucz per grupa + nazwa
                 key_prefix = f"{group_name}_{name}"
@@ -1920,7 +1920,7 @@ def page_fundamentals() -> None:
     st.markdown("---")
 
     #  Poradnik interpretacji 
-    with st.expander(" Jak interpretować wskaźniki?"):
+    with st.expander("Jak interpretować wskaźniki?"):
         st.markdown("""
 **P/E Ratio** (Cena / Zysk na akcję)
 - Mówi ile płacisz za każdy $1 zysku firmy
@@ -3299,9 +3299,9 @@ def page_emergency() -> None:
                 st.success(" System odblokowany")
                 st.rerun()
             else:
-                st.error(" Błędne hasło lub błąd API")
+                st.error("Błędne hasło lub błąd API")
     else:
-        st.success(" System działa normalnie")
+        st.success("System działa normalnie")
         st.markdown("---")
 
         st.markdown("""
