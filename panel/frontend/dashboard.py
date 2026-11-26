@@ -721,10 +721,10 @@ PAGES = {
     "Dashboard":       "Dashboard",
     "Agenci":          "Agenci",
     "Pozycje":         "Pozycje",
-    "Transakcje":      "Transakcje",
+    "Zlecenia":       "Transakcje",
     "Sygnały":         "Sygnały",
     "Ryzyko":         "Ryzyko",
-    "Wydajność":       "Wydajność",
+    "Wyniki":          "Wydajność",
     "Szef / Ranking":  "Szef",
     "Krypto":           "Krypto",
     "Rynki":           "Rynki",
@@ -2266,7 +2266,7 @@ def page_paper_session() -> None:
         st.subheader(" Konfiguracja sesji")
         col1, col2 = st.columns(2)
         with col1:
-            duration = st.slider("⏱ Czas trwania (minuty)", 1, 360, 5)
+            duration = st.slider("Czas trwania (minuty)", 1, 360, 5)
             st.caption(f" {duration} min = {duration//60}h {duration%60}min")
             capital  = st.number_input(" Kapitał startowy ($)", 1000, 100000, 10000, step=1000)
         with col2:
@@ -2416,7 +2416,7 @@ def page_paper_session() -> None:
             progress_pct  = min(1.0, elapsed_sec / max(total_sec, 1))
             time_str      = f"{remaining_min}m {remaining_s:02d}s"
             if remaining_sec == 0:
-                time_str = "⏰ Kończy się..."
+                time_str = "Kończy się..."
         except Exception:
             time_str     = "—"
             progress_pct = 0.0
@@ -2491,7 +2491,7 @@ def page_paper_session() -> None:
             if st.button(" Odśwież", use_container_width=True):
                 st.rerun()
         with col2:
-            if st.button("⏹ Zakończ i pokaż raport", use_container_width=True, type="primary"):
+            if st.button("Zakończ i pokaż raport", use_container_width=True, type="primary"):
                 data = _get(f"/paper-session/{sid}/status")
                 if data:
                     st.session_state.ps_status      = "done"
@@ -2509,7 +2509,7 @@ def page_paper_session() -> None:
                 for t in reversed(trades[-40:]):
                     is_long   = t["direction"] == "LONG"
                     pnl       = t.get("pnl_usd")
-                    pnl_str   = f"<b style='color:{'#34d399' if (pnl or 0)>=0 else '#f87171'}'>{'+'if(pnl or 0)>=0 else ''}${pnl:.2f}</b>" if pnl is not None else "<span style='color:#fbbf24'>⏳ otwarta</span>"
+                    pnl_str   = f"<b style='color:{'#34d399' if (pnl or 0)>=0 else '#f87171'}'>{'+'if(pnl or 0)>=0 else ''}${pnl:.2f}</b>" if pnl is not None else "<span style='color:#fbbf24'>otwarta</span>"
                     border    = "#34d399" if is_long else "#f87171"
                     status    = t.get("status","")
                     status_color = "#34d399" if status=="CLOSED" else "#fbbf24" if status=="OPEN" else "#64748b"
@@ -2530,7 +2530,7 @@ def page_paper_session() -> None:
                         unsafe_allow_html=True,
                     )
             else:
-                st.markdown('<div style="text-align:center;color:#475569;padding:30px;">⏳ Czekam na pierwsze sygnały...</div>', unsafe_allow_html=True)
+                st.markdown('<div style="text-align:center;color:#475569;padding:30px;">Czekam na pierwsze sygnały...</div>', unsafe_allow_html=True)
 
         st.caption(" Kliknij ' Odśwież' aby zaktualizować dane")
 
@@ -3235,7 +3235,7 @@ def page_users() -> None:
     #  Oczekujące na zatwierdzenie 
     pending = [u for u in users if not u.get("approved") and not u.get("builtin")]
     if pending:
-        st.subheader(f"⏳ Oczekujące na zatwierdzenie ({len(pending)})")
+        st.subheader(f"Oczekujące na zatwierdzenie ({len(pending)})")
         for u in pending:
             col1, col2, col3 = st.columns([3, 1, 1])
             col1.markdown(f"**{u['username']}** — `viewer` — {u.get('created_at','')[:10]}")
