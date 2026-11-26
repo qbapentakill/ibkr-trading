@@ -1505,7 +1505,7 @@ def page_risk() -> None:
 
 
 def page_performance() -> None:
-    st.title("Wydajność agentów")
+    st.title("Wyniki agentów")
     perf = _get("/performance")
     if not perf:
         st.info("Brak danych wydajnościowych (system musi być aktywny przez jakiś czas)")
@@ -2143,7 +2143,7 @@ def page_coach() -> None:
 
 def page_transactions() -> None:
     _page_autorefresh("transactions", "30s")
-    st.title("Transakcje")
+    st.title("Zlecenia")
 
     from streamlit_autorefresh import st_autorefresh
     st_autorefresh(interval=10000, key="tx_autorefresh")
