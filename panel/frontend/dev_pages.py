@@ -51,7 +51,7 @@ def _api(path: str, default: Any = None) -> Any:
 def _badge(text: str, color: str) -> str:
     return (
         f'<span style="background:{color};color:#fff;padding:2px 8px;'
-        f'border-radius:10px;font-size:11px;font-weight:600;">{text}</span>'
+        f'border-radius:4px;font-size:11px;font-weight:600;">{text}</span>'
     )
 
 def _event_color(event_type: str) -> str:
@@ -90,10 +90,10 @@ LOG_DIR = Path(__file__).parent.parent.parent / "logs"
 # ═════════════════════════════════════════════════════════════════════════════
 
 def page_dev_monitor() -> None:
-    st.title("🔍 Dev Monitor")
+    st.title("Dev Monitor")
     st.markdown("Kompletny rejestr wszystkich zdarzeń systemu w czasie rzeczywistym.")
 
-    tab1, tab2, tab3 = st.tabs(["📋 Audit Log", "⚡ Activity Feed", "📊 Statystyki"])
+    tab1, tab2, tab3 = st.tabs(["Audit Log", "Activity Feed", "Statystyki"])
 
     # ── Tab 1: Audit Log ─────────────────────────────────────────────────────
     with tab1:
@@ -101,7 +101,7 @@ def page_dev_monitor() -> None:
 
         col1, col2, col3 = st.columns([2, 2, 1])
         with col1:
-            search = st.text_input("🔍 Szukaj", placeholder="np. enable_agent, AAPL, admin", key="audit_search")
+            search = st.text_input("Szukaj", placeholder="np. enable_agent, AAPL, admin", key="audit_search")
         with col2:
             action_filter = st.selectbox("Typ akcji", [
                 "Wszystkie", "login", "enable_agent", "disable_agent",
@@ -203,14 +203,14 @@ def page_dev_monitor() -> None:
 
         c1, c2, c3, c4, c5 = st.columns(5)
         metrics = [
-            ("Sygnały", stats.get("signals_24h", 0), "🎯"),
-            ("Zlecenia", stats.get("orders_24h", 0), "📋"),
-            ("Zatwierdzone", stats.get("approved_24h", 0), "✅"),
-            ("Odrzucone", stats.get("rejected_24h", 0), "❌"),
-            ("Błędy", stats.get("errors_24h", 0), "⚠️"),
+            ("Sygnały", stats.get("signals_24h", 0), ""),
+            ("Zlecenia", stats.get("orders_24h", 0), ""),
+            ("Zatwierdzone", stats.get("approved_24h", 0), ""),
+            ("Odrzucone", stats.get("rejected_24h", 0), ""),
+            ("Błędy", stats.get("errors_24h", 0), ""),
         ]
         for col, (label, val, icon) in zip([c1, c2, c3, c4, c5], metrics):
-            col.metric(f"{icon} {label}", val)
+            col.metric(label, val)
 
         # Wykres aktywności per agent
         agent_stats = stats.get("per_agent", {})
@@ -262,14 +262,14 @@ def _render_activity_feed(events: list) -> None:
         if conf is not None:
             parts.append(f"| conf: **{conf*100:.0f}%**")
         if paper:
-            parts.append("📄")
+            parts.append("[paper]")
 
         line = " ".join(parts)
 
         if reasoning:
             with st.expander(line.replace("**", "").replace("`", ""), expanded=False):
                 st.markdown(line, unsafe_allow_html=True)
-                st.caption(f"💬 {reasoning}")
+                st.caption(f"{reasoning}")
                 details = ev.get("details", {})
                 if details:
                     st.json(details)
@@ -280,7 +280,7 @@ def _render_activity_feed(events: list) -> None:
 def _render_mock_audit() -> None:
     """Mock data gdy API offline."""
     st.markdown("---")
-    st.caption("📌 Przykład — dane testowe (backend offline)")
+    st.caption("Przykład — dane testowe (backend offline)")
     mock = [
         {"ts": "29.10 14:32:11", "action": "enable_agent",    "user": "admin", "details": {"agent": "momentum_surfer"}},
         {"ts": "29.10 14:28:05", "action": "update_risk_limits", "user": "admin", "details": {"max_drawdown_pct": 8.0}},
@@ -297,7 +297,7 @@ def _render_mock_audit() -> None:
 def _render_mock_feed() -> None:
     """Mock activity feed gdy brak danych."""
     st.markdown("---")
-    st.caption("📌 Przykład — jak będzie wyglądał feed po uruchomieniu bota")
+    st.caption("Przykład — jak będzie wyglądał feed po uruchomieniu bota")
     mock_events = [
         {"agent_name": "momentum_surfer", "event_type": "signal_generated",
          "symbol": "AAPL", "direction": "BUY", "confidence": 0.84,
@@ -326,7 +326,7 @@ def _render_mock_feed() -> None:
 # ═════════════════════════════════════════════════════════════════════════════
 
 def page_pnl_timeline() -> None:
-    st.title("📈 PnL Timeline")
+    st.title("PnL Timeline")
     st.markdown("Historyczny wykres equity i PnL per agent.")
 
     col1, col2, col3 = st.columns([2, 2, 2])
@@ -535,7 +535,7 @@ def _show_period_metrics(df: pd.DataFrame) -> None:
 
 def _render_mock_equity_chart() -> None:
     """Mock equity curve gdy brak danych."""
-    st.caption("📌 Przykład equity curve po uruchomieniu bota")
+    st.caption("Przykład equity curve po uruchomieniu bota")
     import numpy as np
     np.random.seed(42)
     dates = pd.date_range("2026-10-01", periods=200, freq="1h")
@@ -560,10 +560,10 @@ def _render_mock_equity_chart() -> None:
 # ═════════════════════════════════════════════════════════════════════════════
 
 def page_logs_pro() -> None:
-    st.title("📂 Logi PRO")
+    st.title("Logi PRO")
     st.markdown("Pełny dostęp do logów systemu z filtrowaniem.")
 
-    tab_sys, tab_err, tab_trade = st.tabs(["⚙️ System", "🔴 Błędy", "💹 Trading"])
+    tab_sys, tab_err, tab_trade = st.tabs(["System", "Błędy", "Trading"])
 
     for tab, log_file, label in [
         (tab_sys,   "system.log",  "system"),
@@ -630,13 +630,13 @@ def _render_log_tab(filename: str, label: str) -> None:
     for line in reversed(filtered):  # od najnowszych
         line = line.rstrip()
         if "ERROR" in line or "CRITICAL" in line:
-            colored_lines.append(f"🔴 {line}")
+            colored_lines.append(f"[ERR] {line}")
         elif "WARNING" in line:
-            colored_lines.append(f"🟡 {line}")
+            colored_lines.append(f"[WRN] {line}")
         elif "SUCCESS" in line or "✓" in line or "filled" in line.lower():
-            colored_lines.append(f"🟢 {line}")
+            colored_lines.append(f"[OK]  {line}")
         else:
-            colored_lines.append(f"   {line}")
+            colored_lines.append(f"      {line}")
 
     log_text = "\n".join(colored_lines[:500])  # max 500 na ekran
     st.code(log_text, language=None)
@@ -644,7 +644,7 @@ def _render_log_tab(filename: str, label: str) -> None:
     # Download przycisku
     raw_text = "".join(filtered)
     st.download_button(
-        f"⬇️ Pobierz {filename}",
+        f"Pobierz {filename}",
         data=raw_text.encode("utf-8"),
         file_name=filename,
         mime="text/plain",
@@ -669,7 +669,7 @@ def _render_mock_log() -> None:
 # ═════════════════════════════════════════════════════════════════════════════
 
 def page_signals_pro() -> None:
-    st.title("🎯 Sygnały PRO")
+    st.title("Sygnały PRO")
     st.markdown("Pełne dane każdego sygnału z wskaźnikami technicznymi.")
 
     col1, col2, col3, col4 = st.columns(4)
@@ -732,11 +732,11 @@ def page_signals_pro() -> None:
 
         # Status badge
         if approved is True:
-            status_badge = _badge("✅ ZATWIERDZONE", "#10b981")
+            status_badge = _badge("Approved", "#10b981")
         elif approved is False:
-            status_badge = _badge("❌ ODRZUCONE", "#ef4444")
+            status_badge = _badge("Rejected", "#ef4444")
         else:
-            status_badge = _badge("⏳ OCZEKUJE", "#f59e0b")
+            status_badge = _badge("Pending", "#f59e0b")
 
         dir_color = "#34d399" if direction == "BUY" else "#f87171"
         title = f"{ts} | {agent} | {_badge(direction, dir_color)} {symbol} | conf: {conf*100:.0f}%"
@@ -769,7 +769,7 @@ def page_signals_pro() -> None:
 
 
 def _render_mock_signals() -> None:
-    st.caption("📌 Przykład sygnałów PRO")
+    st.caption("Przykład sygnałów PRO")
     mock = [
         {
             "timestamp": "2026-10-29T14:35:22Z",
@@ -819,9 +819,9 @@ def _render_mock_signals() -> None:
         dir_color = "#34d399" if direction == "BUY" else "#f87171"
 
         if approved is True:
-            status = _badge("✅ ZATWIERDZONE", "#10b981")
+            status = _badge("Approved", "#10b981")
         else:
-            status = _badge("❌ ODRZUCONE", "#ef4444")
+            status = _badge("Rejected", "#ef4444")
 
         with st.expander(f"{ts}  {agent}  {direction} {symbol}  {conf*100:.0f}%"):
             c1, c2 = st.columns([1, 2])
@@ -841,7 +841,7 @@ def _render_mock_signals() -> None:
 # ═════════════════════════════════════════════════════════════════════════════
 
 def page_system_health() -> None:
-    st.title("💻 System Health")
+    st.title("System Health")
     st.markdown("Monitorowanie zasobów systemowych i połączeń.")
 
     # Auto-refresh co 10s
@@ -886,25 +886,25 @@ def _render_local_health() -> None:
 
         # CPU
         cpu_color = "#ef4444" if cpu > 80 else "#f59e0b" if cpu > 60 else "#34d399"
-        c1.metric("🖥️ CPU", f"{cpu:.1f}%")
+        c1.metric("CPU", f"{cpu:.1f}%")
 
         # RAM
         ram_color = "#ef4444" if ram.percent > 85 else "#f59e0b" if ram.percent > 70 else "#34d399"
-        c2.metric("💾 RAM", f"{ram.percent:.1f}%", f"{ram.used/1024/1024:.0f} MB")
+        c2.metric("RAM", f"{ram.percent:.1f}%", f"{ram.used/1024/1024:.0f} MB")
 
         # Disk
-        c3.metric("💿 Dysk", f"{disk.percent:.1f}%", f"{disk.free/1024/1024/1024:.1f} GB free")
+        c3.metric("Dysk", f"{disk.percent:.1f}%", f"{disk.free/1024/1024/1024:.1f} GB free")
 
         # IBKR (z shared_state jeśli dostępny)
         try:
             from core.shared_state import shared_state
             snap = shared_state.snapshot()
             ibkr = snap.get("ibkr_connected", False)
-            c4.metric("🔌 IBKR", "✅ Połączony" if ibkr else "❌ Offline")
-            c5.metric("📊 Tryb", "PAPER" if snap.get("paper_mode", True) else "🔴 LIVE")
+            c4.metric("IBKR", "Connected" if ibkr else "Offline")
+            c5.metric("Tryb", "PAPER" if snap.get("paper_mode", True) else "LIVE")
         except Exception:
-            c4.metric("🔌 IBKR", "❓ Nieznany")
-            c5.metric("📊 Tryb", "—")
+            c4.metric("IBKR", "Unknown")
+            c5.metric("Tryb", "—")
 
         # Gauge chart CPU
         fig = go.Figure(go.Indicator(
@@ -956,13 +956,13 @@ def _render_local_health() -> None:
 
 def _render_health_from_api(health: dict) -> None:
     c1, c2, c3, c4, c5, c6 = st.columns(6)
-    c1.metric("🖥️ CPU", f"{health.get('cpu_pct', 0):.1f}%")
-    c2.metric("💾 RAM", f"{health.get('ram_pct', 0):.1f}%",
+    c1.metric("CPU", f"{health.get('cpu_pct', 0):.1f}%")
+    c2.metric("RAM", f"{health.get('ram_pct', 0):.1f}%",
               f"{health.get('ram_mb', 0):.0f} MB")
-    c3.metric("🔌 IBKR", "✅" if health.get("ibkr_connected") else "❌")
-    c4.metric("⚡ Agenci", health.get("active_agents", 0))
-    c5.metric("🎯 Sygnały dziś", health.get("signals_today", 0))
-    c6.metric("⚠️ Błędy dziś", health.get("errors_today", 0))
+    c3.metric("IBKR", "Connected" if health.get("ibkr_connected") else "Offline")
+    c4.metric("Agenci", health.get("active_agents", 0))
+    c5.metric("Sygnały dziś", health.get("signals_today", 0))
+    c6.metric("Błędy dziś", health.get("errors_today", 0))
 
 
 def _chart_system_history(df: pd.DataFrame) -> None:
@@ -995,13 +995,13 @@ def _chart_system_history(df: pd.DataFrame) -> None:
 # ═════════════════════════════════════════════════════════════════════════════
 
 def page_dev_export() -> None:
-    st.title("⬇️ Export Danych")
+    st.title("Export Danych")
     st.markdown("Pobierz surowe dane systemu do analizy w Excel/Python/R.")
 
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("#### 📋 Export tabelaryczny")
+        st.markdown("#### Export tabelaryczny")
 
         export_type = st.selectbox("Dane", [
             "Transakcje (orders)",
@@ -1017,11 +1017,11 @@ def page_dev_export() -> None:
         date_to   = st.date_input("Do", value=datetime.now().date(), key="export_to")
         fmt       = st.radio("Format", ["CSV", "JSON"], horizontal=True, key="export_fmt")
 
-        if st.button("🔄 Przygotuj export", type="primary", use_container_width=True):
+        if st.button("Przygotuj export", type="primary", use_container_width=True):
             _do_export(export_type, str(date_from), str(date_to), fmt)
 
     with col2:
-        st.markdown("#### 📊 Szybkie statystyki")
+        st.markdown("#### Szybkie statystyki")
 
         stats = _api("/dev/export-stats") or {}
         if stats:
@@ -1041,7 +1041,7 @@ def page_dev_export() -> None:
             st.info("Backend offline — statystyki niedostępne")
 
         st.markdown("---")
-        st.markdown("#### 💾 Backup całej bazy")
+        st.markdown("#### Backup całej bazy")
         st.caption("Plik SQLite z całą historią tradingu")
 
         db_path = Path(__file__).parent.parent.parent / "data" / "trading.db"
@@ -1049,7 +1049,7 @@ def page_dev_export() -> None:
             with open(db_path, "rb") as f:
                 db_bytes = f.read()
             st.download_button(
-                "⬇️ Pobierz trading.db",
+                "Pobierz trading.db",
                 data=db_bytes,
                 file_name=f"trading_backup_{datetime.now().strftime('%Y%m%d_%H%M')}.db",
                 mime="application/octet-stream",
@@ -1086,7 +1086,7 @@ def _do_export(export_type: str, date_from: str, date_to: str, fmt: str) -> None
         csv_bytes = df.to_csv(index=False).encode("utf-8")
         fname = f"{export_type.split()[0].lower()}_{date_from}_{date_to}.csv"
         st.download_button(
-            f"⬇️ Pobierz {fname}", data=csv_bytes,
+            f"Pobierz {fname}", data=csv_bytes,
             file_name=fname, mime="text/csv",
         )
         st.success(f"Gotowe! {len(df)} wierszy")
@@ -1094,7 +1094,7 @@ def _do_export(export_type: str, date_from: str, date_to: str, fmt: str) -> None
         json_bytes = json.dumps(data, indent=2, default=str).encode("utf-8")
         fname = f"{export_type.split()[0].lower()}_{date_from}_{date_to}.json"
         st.download_button(
-            f"⬇️ Pobierz {fname}", data=json_bytes,
+            f"Pobierz {fname}", data=json_bytes,
             file_name=fname, mime="application/json",
         )
         st.success(f"Gotowe! {len(data)} rekordów")
@@ -1102,7 +1102,7 @@ def _do_export(export_type: str, date_from: str, date_to: str, fmt: str) -> None
 
 def _generate_mock_export(export_type: str, fmt: str) -> None:
     """Generuje mock CSV gdy backend offline."""
-    st.caption("📌 Przykładowy CSV (backend offline)")
+    st.caption("Przykładowy CSV (backend offline)")
     mock_df = pd.DataFrame([
         {"timestamp": "2026-10-29 14:35:22", "symbol": "AAPL",
          "side": "BUY", "quantity": 5, "price": 178.47, "status": "FILLED", "agent": "momentum_surfer"},
@@ -1111,6 +1111,6 @@ def _generate_mock_export(export_type: str, fmt: str) -> None:
     ])
     csv = mock_df.to_csv(index=False).encode("utf-8")
     st.download_button(
-        "⬇️ Pobierz przykład (mock)", data=csv,
+        "Pobierz przykład (mock)", data=csv,
         file_name="mock_export.csv", mime="text/csv",
     )

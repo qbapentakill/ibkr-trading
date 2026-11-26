@@ -1,4 +1,4 @@
-﻿"""
+"""
 Panel sterowania – IBKR Multi-Agent Trading System
 Streamlit dashboard z ciemnym motywem.
 
@@ -100,7 +100,7 @@ st.markdown("""
     }
     .status-badge {
         padding: 4px 10px;
-        border-radius: 12px;
+        border-radius: 4px;
         font-weight: 600;
         font-size: 11px;
         text-transform: uppercase;
@@ -186,7 +186,7 @@ st.markdown("""
         font-size: 11px;
         font-weight: 600;
         padding: 4px 10px;
-        border-radius: 20px;
+        border-radius: 4px;
         background: #1a2744;
         border: 1px solid #3b82f6;
         color: #93c5fd;
@@ -302,6 +302,24 @@ st.markdown("""
         background: linear-gradient(135deg, #2563eb, #1d4ed8);
         box-shadow: 0 4px 12px rgba(59,130,246,0.4);
         transform: translateY(-1px);
+    }
+
+    /*  Navigation buttons — prevent text wrapping  */
+    [data-testid="column"] .stButton button {
+        white-space: nowrap;
+        min-width: 90px;
+        font-size: 12px;
+        padding: 4px 8px;
+        background: transparent;
+        border: none;
+        color: #f5f5f7;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    [data-testid="column"] .stButton button:hover {
+        background: rgba(255,255,255,0.08);
+        box-shadow: none;
+        transform: none;
+        color: #fff;
     }
 
     /*  Emergency button  */
@@ -731,9 +749,9 @@ def render_top_nav() -> None:
         ("Dashboard", "Dashboard"),
         ("Agenci", "Agenci"),
         ("Pozycje", "Pozycje"),
-        ("Transakcje", "Transakcje"),
+        ("Zlecenia", "Transakcje"),
         ("Sygnały", "Sygnały"),
-        ("Wydajność", "Wydajność"),
+        ("Wyniki", "Wydajność"),
         ("Szef", "Szef"),
     ]
     
@@ -749,12 +767,12 @@ def render_top_nav() -> None:
         ("Krypto", "Krypto"),
         ("Logi", "Logi"),
         # ── DEV PANEL ──────────────────────────────
-        ("🔍 Dev Monitor",  "Dev Monitor"),
-        ("📈 PnL Timeline", "PnL Timeline"),
-        ("📂 Logi PRO",     "Logi PRO"),
-        ("🎯 Sygnały PRO",  "Sygnały PRO"),
-        ("💻 System Health","System Health"),
-        ("⬇️ Export",       "Export"),
+        ("Dev Monitor",  "Dev Monitor"),
+        ("PnL Timeline", "PnL Timeline"),
+        ("Logi PRO",     "Logi PRO"),
+        ("Sygnały PRO",  "Sygnały PRO"),
+        ("System Health","System Health"),
+        ("Export",       "Export"),
     ]
     if not _is_viewer():
         more_pages += [("Użytkownicy", "Uzytkownicy"), ("Emergency", "Emergency")]
@@ -764,7 +782,7 @@ def render_top_nav() -> None:
     
     # Logo
     with col_logo:
-        st.markdown("<div style='padding:6px 0;font-weight:600;font-size:14px;color:#f5f5f7;'>⚡ IBKR Trading</div>", unsafe_allow_html=True)
+        st.markdown("<div style='padding:6px 0;font-weight:600;font-size:14px;color:#f5f5f7;'>IBKR Trading</div>", unsafe_allow_html=True)
     
     # Główne przyciski (małe, płaskie)
     with col_nav:
@@ -3470,7 +3488,7 @@ def main() -> None:
         for key in ("Dev Monitor", "PnL Timeline", "Logi PRO",
                     "Sygnały PRO", "System Health", "Export"):
             dispatch[key] = lambda: st.error(
-                "⚠️ Dev pages nie załadowane. Sprawdź logi konsoli."
+                "Dev pages nie załadowane. Sprawdź logi konsoli."
             )
     dispatch.get(page, page_dashboard)()
 
